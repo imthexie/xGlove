@@ -1,0 +1,325 @@
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM303_U.h>
+#include <Adafruit_9DOF.h>
+
+/* Assign a unique ID to the sensors */
+Adafruit_9DOF                 dof   = Adafruit_9DOF();
+Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
+Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
+
+/* Global Variables for Accelerometer, Gyroscope, Magnetometer */ 
+sensors_event_t accel_event;
+sensors_event_t mag_event;
+sensors_vec_t   orientation;
+
+/* Analog Input Pins corresponding to each finger   */
+const int ring         = A0;
+const int middle       = A1;
+const int index_top    = A2;
+const int index_side1  = A3;
+const int index_side2  = A4; 
+
+
+/* Global Variables for Mouse functionality         */
+int currently_clicked = 0;
+int range = 12;                  // output range of X or Y movement
+int responseDelay = 2;           // response delay of the mouse, in ms
+int threshold = range/18;        // resting threshold  originally -> /10
+int center = range/2;            // resting position value
+int minima[] = {0, -40};         // actual analogRead minima for {x, y}
+int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
+
+
+/* Initialise all the sensors */
+void initSensors()
+{
+    if(!accel.begin())
+    {
+        /* There was a problem detecting the LSM303 ... check your connections */
+        Serial.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
+        while(1);
+    }
+    if(!mag.begin())
+    {
+        /* There was a problem detecting the LSM303 ... check your connections */
+        Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
+        while(1);
+    } 
+}
+
+/* Program Setup */
+void setup() 
+{
+    Serial.begin(115200);
+    
+    /* start mouse and keyboard control */
+    Mouse.begin();
+    Keyboard.begin();
+    
+    /* Initialise the sensors */
+    initSensors();
+    
+    /* Read the accelerometer and magnetometer */
+    accel.getEvent(&accel_event);
+    mag.getEvent(&mag_event);
+  
+    /* calibrate x-axis minima and maxima based on the current orientation  */
+    /* of the glove                                                         */  
+    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
+    {
+         minima[0] = orientation.heading - 50;
+         maxima[0] = orientation.heading + 50;
+    }  
+    
+}               
+    
+void loop() 
+{ 
+    /***************** start of mouse functionality - including move, click, scroll ****************/
+    
+    /* Read the accelerometer and magnetometer */
+    accel.getEvent(&accel_event);
+    mag.getEvent(&mag_event);
+    dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
+    
+    /*---------- mouse left click functionality ----------*/
+    int mouse_left_click = analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                   analogRead(A3) + analogRead(A4);
+                     
+    Serial.print("mouse_left_click value: ");  // for debugging          
+    Serial.println(mouse_left_click);    // for debugging
+    
+    if(mouse_left_click < 840 && mouse_left_click > 720 && currently_clicked == 0 && abs(orientation.pitch) < 35){
+        Mouse.click(MOUSE_LEFT); // left click // Mouse.press(MOUSE_LEFT);
+        currently_clicked = 1; 
+ 
+    } 
+    else if(mouse_left_click > 870){ 
+        Mouse.release();
+        currently_clicked = 0;
+  
+    }    // release
+     
+            /*---------- end of mouse left click functionality ----------*/  
+
+    /*---------- mouse move functionality ----------*/ 
+    
+    /* Read the accelerometer and magnetometer */
+    accel.getEvent(&accel_event);
+    mag.getEvent(&mag_event);
+  
+    /* Use the new fusionGetOrientation function to merge accel/mag data */  
+    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
+    {
+        int xReading = readAxis(orientation.heading, 0);
+        int yReading = readAxis(orientation.roll, 1);
+        Mouse.move(5*xReading, 4*yReading, 0);
+        delay(responseDelay);
+    }
+    /*---------- end of mouse move functionality ----------*/
+
+    
+    /* ----------------- scroll mode -------------------- */
+    
+    Serial.print("index: ");               
+    Serial.println(analogRead(index_top));
+    Serial.print("middle: ");               
+    Serial.println(analogRead(middle));
+    
+    
+    /* enter scroll mode by bending ring finger more than middle finger */
+    if(analogRead(ring) + 60 < analogRead(middle) && analogRead(index_top) > 175 && analogRead(middle) > 200)
+    {
+        
+        /* delay until user stretches ring finger again */
+        while(analogRead(ring) + 40 < analogRead(middle)) delay(20);
+        
+        /* start scrolling */
+        while(analogRead(ring) + 60 >= analogRead(middle))
+        {
+            int scroll = analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                        analogRead(A3) + analogRead(A4) - 1000;
+            
+            if(scroll > 70)
+            {
+               for(int i = 0; i < scroll; i = i + 30)
+               {
+                   Mouse.move(0, 0, 1);
+                   /* exit scroll mode when ring finger is bent again */
+                   if(analogRead(ring) + 65 < analogRead(middle)) break;   
+                   delay(100);
+                }
+            }
+            
+            else if(scroll < -70){   
+                for(int i = 0; i > scroll; i = i - 30)
+                {
+                   Mouse.move(0, 0, -1);
+                   /* exit scroll mode when ring finger is bent again */
+                   if(analogRead(ring) + 65 < analogRead(middle)) break;
+                   delay(100);
+                }
+            }
+        }
+        
+        /* delay until user stretches ring finger again */
+        while(analogRead(ring) + 40 < analogRead(middle)) delay(20);
+    }
+    
+    /* end of scroll functionality */
+    
+    /********************************** end of mouse functionality ****************************/ 
+     
+    
+    
+    /****************     simulate spacebar - to pause video or music     *********************/ 
+    
+    int spacebar = analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                   analogRead(A3) + analogRead(A4);
+    Serial.print("Spacebar: ");               
+    Serial.println(spacebar);
+    if(spacebar < 700)
+    {
+         Keyboard.write(32); 
+         while(spacebar < 800)
+         {
+             spacebar = analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                        analogRead(A3) + analogRead(A4);
+             delay(20);  
+         }
+    }
+    /***************************     End of spacebar    ***************************/
+ 
+    /*********** MAC LAUNCHPAD FUNCTIONALITY ***************/
+    
+    /* Read the accelerometer and magnetometer */
+    accel.getEvent(&accel_event);
+    mag.getEvent(&mag_event);
+    /* Use the new fusionGetOrientation function to merge accel/mag data */  
+    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
+    {
+        if(abs(orientation.roll) > 170)
+        {
+            /* This for loop is used to ensure that the glove is upside down */
+            /* for at least .5 second (10*delay(50))                         */          
+            for(int i = 0; i < 10; i+=1){
+
+                /* Get the accelerometer, gyroscope and magnetometer data */
+                accel.getEvent(&accel_event);
+                mag.getEvent(&mag_event);
+                if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
+                { 
+                    if(abs(orientation.roll) < 115) 
+                    { //break if hand is back in original position
+                        break;
+                    }
+                    else if(i == 9) 
+                    {
+                        /* enter Launchpad */
+                        Keyboard.press(KEY_LEFT_GUI);
+                        Keyboard.press(KEY_LEFT_SHIFT); 
+                        Keyboard.press('L');
+                        Keyboard.releaseAll();
+                        Keyboard.release(215); 
+                        
+                        /* delay until glove is back in original position  */
+                        while(abs(orientation.roll) > 50)
+                        {
+                            accel.getEvent(&accel_event);
+                            mag.getEvent(&mag_event);
+                            dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
+                            delay(100);
+                        }
+                    }
+                }
+                delay(50);
+            }     
+        }    
+    }
+ 
+/********* END OF MAC LAUNCHPAD FUNCTIONALITY ******************/
+
+/********* SIMULATE ARROW KEYS FOR POWERPOINT ******************/
+
+    /* Read the accelerometer and magnetometer */
+    accel.getEvent(&accel_event);
+    mag.getEvent(&mag_event);
+    
+    /*Serial.println(analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                   analogRead(A3) + analogRead(A4));*/ // for debugging
+                   
+    /* Use the fusionGetOrientation function to merge accel/mag data */  
+    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
+    {
+        if(orientation.pitch > 70 && analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                   analogRead(A3) + analogRead(A4) < 800)
+        {
+            /* right arrow key */
+            for(int i = 0; i < 1000; i+=1){
+                if(orientation.pitch < 60) break;
+                if(i == 9) 
+                {
+                    Keyboard.press(215);            // right arrow key
+                    Keyboard.release(215);          // 215 is right arrow key
+                    delay(5);
+                    
+                    Keyboard.press(KEY_LEFT_GUI);   // This is a shortkey combination
+                    Keyboard.press(']');            // to move to the next page in the 
+                    Keyboard.releaseAll();          // browser
+                    
+                    delay(1500); 
+                }
+                delay(50);
+            }        
+        }
+        else if(orientation.pitch < -70 &&  analogRead(A0) + analogRead(A1) + analogRead(A2) + 
+                   analogRead(A3) + analogRead(A4) < 800)
+        {
+            /* left arrow key */
+            for(int i = 0; i < 1000; i+=1){
+                if(orientation.pitch > -60) break;
+                if(i == 9) 
+                {
+                    Keyboard.press(216);            // left arrow key
+                    Keyboard.release(216);          // 216 is left arrow key
+                    delay(50);
+                    
+                    Keyboard.press(KEY_LEFT_GUI);   // This is a shortkey combination
+                    Keyboard.press('[');            // to move to the previous page in the 
+                    Keyboard.releaseAll();          // browser
+                    
+                    delay(1500);  
+                    
+                }
+                delay(50);
+            }        
+        }
+    }
+
+
+/********* END OF ARROW KEYS FOR POWERPOINT ******************/
+
+    
+}
+
+int readAxis(int reading, int axisNumber) 
+{
+    int distance = 0;    // distance from center of the output range
+
+    if(axisNumber == 1) reading = reading + 3; // calibration value
+        
+    // map the reading from the analog input range to the output range:
+    reading = map(reading, minima[axisNumber], maxima[axisNumber], 0, range);
+    
+    // if the output reading is outside from the
+    // rest position threshold,  use it:
+    if (abs(reading - center) > threshold) distance = (reading - center);
+
+    // the reading needs to be inverted in order to 
+    // map the movemment correctly:
+    distance = -distance;
+
+    // return the distance for this axis:
+    return distance;
+}
