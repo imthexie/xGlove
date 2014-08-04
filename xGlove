@@ -77,6 +77,8 @@ void setup()
     
 void loop() 
 { 
+    
+    
     /***************** START OF MOUSE FUNCTIONALITY - including move, click, scroll ****************/
     
     /* Read the accelerometer and magnetometer */
