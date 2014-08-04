@@ -1,3 +1,4 @@
+/* Included Libraries */
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303_U.h>
@@ -76,32 +77,34 @@ void setup()
     
 void loop() 
 { 
-    /***************** start of mouse functionality - including move, click, scroll ****************/
+    /***************** START OF MOUSE FUNCTIONALITY - including move, click, scroll ****************/
     
     /* Read the accelerometer and magnetometer */
     accel.getEvent(&accel_event);
     mag.getEvent(&mag_event);
     dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);
     
+    
     /*---------- mouse left click functionality ----------*/
     int mouse_left_click = analogRead(A0) + analogRead(A1) + analogRead(A2) + 
                    analogRead(A3) + analogRead(A4);
                      
     Serial.print("mouse_left_click value: ");  // for debugging          
-    Serial.println(mouse_left_click);    // for debugging
+    Serial.println(mouse_left_click);          // for debugging
     
     if(mouse_left_click < 840 && mouse_left_click > 720 && currently_clicked == 0 && abs(orientation.pitch) < 35){
         Mouse.click(MOUSE_LEFT); // left click // Mouse.press(MOUSE_LEFT);
-        currently_clicked = 1; 
+        currently_clicked = 1;   // there is a left click
  
     } 
     else if(mouse_left_click > 870){ 
-        Mouse.release();
-        currently_clicked = 0;
+        Mouse.release(); //release click
+        currently_clicked = 0;   // there is no left click
   
-    }    // release
+    }    
      
-            /*---------- end of mouse left click functionality ----------*/  
+    /*---------- end of mouse left click functionality ----------*/  
+
 
     /*---------- mouse move functionality ----------*/ 
     
@@ -169,11 +172,11 @@ void loop()
     
     /* end of scroll functionality */
     
-    /********************************** end of mouse functionality ****************************/ 
+    /********************************** END OF MOUSE FUNCTIONALITY ***********************/ 
      
     
     
-    /****************     simulate spacebar - to pause video or music     *********************/ 
+    /****************     SIMULATE SPACEBAR - to pause video or pause music     *********************/ 
     
     int spacebar = analogRead(A0) + analogRead(A1) + analogRead(A2) + 
                    analogRead(A3) + analogRead(A4);
@@ -189,7 +192,9 @@ void loop()
              delay(20);  
          }
     }
-    /***************************     End of spacebar    ***************************/
+    /***************************     END OF SPACEBAR    ***************************/
+ 
+ 
  
     /*********** MAC LAUNCHPAD FUNCTIONALITY ***************/
     
@@ -240,7 +245,9 @@ void loop()
  
 /********* END OF MAC LAUNCHPAD FUNCTIONALITY ******************/
 
-/********* SIMULATE ARROW KEYS FOR POWERPOINT ******************/
+
+
+/********* ARROW KEYS FOR POWERPOINT AND NEXT PREVIOUS PAGE IN BROWSER ******************/
 
     /* Read the accelerometer and magnetometer */
     accel.getEvent(&accel_event);
@@ -302,6 +309,12 @@ void loop()
 
     
 }
+
+/* Function: readAxis
+ * -----------------------------------------------------------------
+ * This function is used when moving the mouse. The function determines the 
+ * position on the screen corresponding to the current position of the glove. 
+ */
 
 int readAxis(int reading, int axisNumber) 
 {
