@@ -14,7 +14,7 @@ Sensor::Sensor()
     _middle_finger_bent =  250;
     _ring_finger_bent   =  250;
     _pinky_bent         =  250;
-    _all_fingers_bent   =  _index_finger_bent + _middle_finger_bent + _ring_finger_bent + _pinky_bent; 
+    _four_fingers_bent   =  _index_finger_bent + _middle_finger_bent + _ring_finger_bent + _pinky_bent; 
 }
 
 void Sensor::pin_setup(int index_finger_pin, int middle_finger_pin, int ring_finger_pin, int pinky_pin)
@@ -61,5 +61,32 @@ boolean Sensor::all_fingers_bent(double percentage_bent)
             analogRead(_pinky_pin) < (percentage_bent/100) * _all_fingers_bent);
 }
 
+int get_inclination_percentage(){
+    return (analogRead(_index_finger_pin) + analogRead(_middle_finger_pin) + analogRead(_ring_finger_pin) +
+           analogRead(_pinky_pin)); 
+}
+
+
+/* Function: initSensors
+ * ---------------------
+ * This function initializes the accelerometer, magnetometer,
+ * and gyroscope. See https://github.com/adafruit/Adafruit_Sensor 
+ * and https://github.com/adafruit/Adafruit_9DOF for more information. 
+ */
+void initSensors()
+{
+    if(!accel.begin())
+    {
+        /* There was a problem detecting the LSM303 ... check your connections */
+        Serial.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
+        while(1);
+    }
+    if(!mag.begin())
+    {
+        /* There was a problem detecting the LSM303 ... check your connections */
+        Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
+        while(1);
+    } 
+}
 
 
