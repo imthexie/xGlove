@@ -28,6 +28,9 @@ class Sensor
     boolean pinky_bent(double percentage_bent);
     boolean all_fingers_bent(double percentage_bent);
     
+    int measure_inclination_fingers();
+    
+    void initSensors();
     
     
   private:
