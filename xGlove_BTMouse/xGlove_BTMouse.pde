@@ -15,7 +15,6 @@ public static final short portIndex = 0;  // select the com port,
 
 int posX, posY, btn; // data from msg fields will be stored here   
 void setup() {
-  size(200, 200);
   println(Serial.list());
   println(" Connecting to -> " + Serial.list()[portIndex]);
   myPort = new Serial(this,Serial.list()[portIndex], 115200);
