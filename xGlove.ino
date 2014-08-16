@@ -1,25 +1,5 @@
 /* Included Libraries */
 #include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_LSM303_U.h>
-#include <Adafruit_9DOF.h>
-
-/* Assign a unique ID to the sensors */
-Adafruit_9DOF                 dof   = Adafruit_9DOF();
-Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
-Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
-
-/* Global Variables for Accelerometer, Gyroscope, Magnetometer */ 
-sensors_event_t accel_event;
-sensors_event_t mag_event;
-sensors_vec_t   orientation;
-
-/* Analog Input Pins corresponding to each finger */
-const int ring         = A0;
-const int middle       = A1;
-const int index_top    = A2;
-const int index_side1  = A3;
-const int index_side2  = A4; 
 
 /* Global Variables for Mouse functionality */
 int currently_clicked = 0;
@@ -31,7 +11,6 @@ int minima[] = {0, -40};         // actual analogRead minima for {x, y}
 int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
 
 /* Function prototypes */
-void initSensors();
 void mouse_left_click(sensors_event_t accel_event, sensors_event_t mag_event, sensors_vec_t orientation);
 void move_mouse(sensors_event_t accel_event, sensors_event_t mag_event, sensors_vec_t orientation);
 void mouse_scroll(); 
@@ -46,33 +25,12 @@ void setup()
     
     /* start mouse and keyboard control */
     Mouse.begin();
-    Keyboard.begin();
-    
-    /* Initialise the sensors */ 
-    initSensors(); 
-    
-    /* Read the accelerometer and magnetometer */
-    accel.getEvent(&accel_event); 
-    mag.getEvent(&mag_event);
-  
-    /* calibrate x-axis minima and maxima based on the current orientation  */
-    /* of the glove                                                         */  
-    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
-    {
-         minima[0] = orientation.heading - 50;
-         maxima[0] = orientation.heading + 50;
-    }     
+    Keyboard.begin();     
 }                
  
  
 void loop() 
-{ 
-    
-    /* Read the accelerometer and magnetometer */
-    accel.getEvent(&accel_event);
-    mag.getEvent(&mag_event);
-    dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);  //merge accel/mag data 
-    
+{     
     mouse_left_click(accel_event, mag_event, orientation); 
     move_mouse(accel_event, mag_event, orientation); 
     mouse_scroll();
@@ -81,30 +39,6 @@ void loop()
     mac_launchpad(accel_event, mag_event, orientation);
     load_next_previous(accel_event, mag_event, orientation);
 } 
-
-
-/* Function: initSensors
- * ---------------------
- * This function initializes the accelerometer, magnetometer,
- * and gyroscope. See https://github.com/adafruit/Adafruit_Sensor 
- * and https://github.com/adafruit/Adafruit_9DOF for more
- * information. 
- */
-void initSensors()
-{
-    if(!accel.begin())
-    {
-        /* There was a problem detecting the LSM303 ... check your connections */
-        Serial.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
-        while(1);
-    }
-    if(!mag.begin())
-    {
-        /* There was a problem detecting the LSM303 ... check your connections */
-        Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
-        while(1);
-    } 
-}
 
 /* Function: mouse_left_click
  * --------------------------
@@ -117,8 +51,7 @@ void initSensors()
  */
 void mouse_left_click(sensors_event_t accel_event, sensors_event_t mag_event, sensors_vec_t orientation){
     
-    int mouse_left_click = analogRead(ring) + analogRead(middle) + analogRead(index_top) + 
-                         analogRead(index_side1) + analogRead(index_side2);
+//    int mouse_left_click = getWholeHandReading();
                      
     if(mouse_left_click < 840 && mouse_left_click > 720 && currently_clicked == 0 && abs(orientation.pitch) < 35){
         Mouse.click(MOUSE_LEFT);  // left click 
@@ -137,9 +70,9 @@ void mouse_left_click(sensors_event_t accel_event, sensors_event_t mag_event, se
  * glove into a corresponding position of the mouse cursor on the screen. 
  */
 void move_mouse(sensors_event_t accel_event, sensors_event_t mag_event, sensors_vec_t orientation){
-    int xReading = get_cursor_position(orientation.heading, 0); // x-axis movement
-    int yReading = get_cursor_position(orientation.roll, 1);    // y-axis movement
-    Mouse.move(5 * xReading, 4 * yReading, 0);       // move the mouse
+    
+    
+    Mouse.move(5 * xMouseReading, 4 * yMouseReading, 0);       // move the mouse
     delay(responseDelay);                            // this delay makes the movements smoother
 }
 
@@ -224,24 +157,19 @@ void mouse_scroll(){
 
 /* Function: spacebar
  * ------------------
- * This function simulates the spacebar key. When making a phist (all fingers
+ * This function simulates the spacebar key. When making a fist (all fingers
  * together) the spacebar key is pressed. The function enters a while loop after
  * simulating the spacebar key that is exited after spreading the fingers again. 
  * This is to ensure that the spacebar is not being pressed continuously when making
- * a phist, but just once. 
+ * a fist, but just once. 
  */
 void spacebar(){
-    int spacebar = analogRead(ring) + analogRead(middle) + analogRead(index_top) + 
-                   analogRead(index_side1) + analogRead(index_side2);
-    if(spacebar < 600) //phist
+//    int spacebar = analogRead(ring) + analogRead(middle) + analogRead(index_top) + 
+//                   analogRead(index_side1) + analogRead(index_side2);
+    if(spacebar < 600) //fist
     {
          Keyboard.write(32); 
-         while(spacebar < 720) // exit when finger are spread again
-         {
-             spacebar = analogRead(ring) + analogRead(middle) + analogRead(index_top) + 
-                        analogRead(index_side1) + analogRead(index_side2);
-             delay(20);  
-         }
+         //I disagree with the spacebar waiting - if you hold down the spacebar on your computer, it will continually fire spacebar events.
     }  
 }
 

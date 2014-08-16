@@ -13,7 +13,7 @@
 #include <Adafruit_9DOF.h>
 
 /* Call Sensor class constructor */
-Sensor                 sensor   = Sensor();
+Sensor sensor = Sensor();
 
 /* Assign a unique ID to the sensors */
 static Adafruit_9DOF                 dof   = Adafruit_9DOF();
