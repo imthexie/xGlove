@@ -33,7 +33,7 @@ void Dispatcher::check_sensor_values() {
     middle_val = analogRead(middle);
     ring_val = analogRead(ring);
     index_top_val = analogRead(index_top);
-    index_side1_val = analogRead(index_side);
+    index_side1_val = analogRead(index_side1);
     index_side2_val = analogRead(index_side2);  
 }
 
