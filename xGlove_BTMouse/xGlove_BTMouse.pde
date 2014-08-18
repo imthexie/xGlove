@@ -59,17 +59,19 @@ void serialEvent(Serial p) {
 }
 
 class arduMouse {
-  Robot myRobot;     // create object from Robot class;
+  Robot mouseRobot;     // create object from Robot class;
   static final short rate = 4; // multiplier to adjust movement rate
   int x, y;
   arduMouse() {
     try {
-      myRobot = new Robot();
+      mouseRobot = new Robot();
     }
     catch (AWTException e) {
       e.printStackTrace();
     }
     Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+    
+    //Put mouse in middle of screen
     y =  (int)screen.getHeight() / 2 ;
     x =  (int)screen.getWidth() / 2;
   }
@@ -77,6 +79,11 @@ class arduMouse {
   void move(int offsetX, int offsetY) {
     x += (rate * offsetX);
     y += (rate * offsetY);
-    myRobot.mouseMove(x, y);
+    mouseRobot.mouseMove(x, y);
+  }
+  
+  //Move mouse to a specified location
+  void moveTo(int xPos, int yPos) {
+    mouseRobot.mouseMove(xPos, yPos);
   }
 }
