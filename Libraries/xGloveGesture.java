@@ -1,6 +1,9 @@
 class Gesture {
     private xGloveSensor sensor; //reference to the sensor
 
+    int minima[] = {0, -40};         // actual analogRead minima for {x, y}
+    int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
+
     public Gesture() {
         this.sensor = xGloveDispatcher.getSensor();
     }
@@ -30,19 +33,22 @@ class Gesture {
             /* for at least .5 second (10*delay(50)).                        */
             /* This is to avoid measurement errors.                          */         
             for(int i = 0; i < 10; i+=1){
-                
-                Thread.sleep(50);
-
-                //sensor.getOrientation() probably updated in background thread.
-                
                 if(Math.abs(sensor.getOrientation().roll) < 115) 
                 { //break if sensor is back in original position
                     return false;
                 }
+
+                Thread.sleep(50);                              
             }    
             return true;  
         }
         return false;    
+    }
+
+    //TODO: gesture for spacebar
+    public boolean isSpacebarGesture() {
+        //??
+        return false;   
     }
 
     public boolean rightSideUp(){
@@ -57,11 +63,11 @@ class Gesture {
     return currentlyClicked && sensor.fingers_spread());
   }
 
-    public boolean scrollModeGesture() {
+    public boolean isScrollModeGesture() {
         return sensor.ringFingerBent(90) && !(sensor.middleFingerBent(50)) && !(sensor.indexFingerBent(50));
     }
 
-    public boolean releaseScrollModeGesture() {
+    public boolean isReleaseScrollModeGesture() {
         return sensor.ringFingerBent(70) && !(sensor.middleFingerBent(50));
     }
 

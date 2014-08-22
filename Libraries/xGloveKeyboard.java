@@ -17,10 +17,7 @@ class xGloveKeyboard {
 		gesture = new xGloveGesture();
 	}
 
-	public boolean isSpacebarGesture() {
-		//??
-	}
-
+    
 	public void doSpacebar() {
 		keyboardRobot.keyPress(KeyEvent.VK_SPACE);
 		keyboardRobot.keyRelease(KeyEvent.VK_SPACE);

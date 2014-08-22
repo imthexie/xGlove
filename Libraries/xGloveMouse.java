@@ -23,28 +23,38 @@ class xGloveMouse {
       e.printStackTrace();
     }
 
+    //Automatic delay after every event fired. TODO: May need adjustment
+    mouseRobot.setAutoDelay(10);
+
     screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-    
+
     //Put mouse in middle of screen
-    y =  (int)screen.getHeight() / 2 ;
-    x =  (int)screen.getWidth() / 2;
+    centerMouse();
 
     currentlyClicked = false;
 
     this.gesture = new xGloveGesture();
   }
+
   // method to move mouse from current posistion by given offset
-  void move(int offsetX, int offsetY) {
+  private void move(int offsetX, int offsetY) {
     x += (rate * offsetX);
     y += (rate * offsetY);
     mouseRobot.mouseMove(x, y);
   }
   
   //Move mouse to a specified location
-  void moveTo(int posX, int posY) {
+  private void moveTo(int posX, int posY) {
     mouseRobot.mouseMove(posX, posY);
   }
  
+  public void centerMouse() {
+    //Put mouse in middle of screen
+    y =  (int)screen.getHeight() / 2 ;
+    x =  (int)screen.getWidth() / 2;
+
+    moveTo(x, y);
+  }
 
     /* Function: mouse_left_click
    * --------------------------
@@ -75,14 +85,11 @@ class xGloveMouse {
    * glove into a corresponding position of the mouse cursor on the screen. 
    */
   public void moveMouse(){
-      int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
-      int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
+    int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
+    int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
 
-      //TODO: Make this pixel density independent 
-      mouseRobot.move(5 * xReading, 4 * yReading, 0);       // move the mouse
-
-      //May or may not need this delay
-      mouseRobot.delay(10);
+    //TODO: Make this pixel density independent 
+    mouseRobot.move(5 * xReading, 4 * yReading, 0);       // move the mouse
   }
 
     /* Function: get_cursor_position
