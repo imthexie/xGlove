@@ -24,8 +24,11 @@ const int index_side2  = A4;
 int middle_val, ring_val, index_top_val, index_side1_val, index_side2_val; 
 
 //X, Y calibration values
-int minima[] = {0, -40};         // actual analogRead minima for {x, y}
-int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
+int range                           =   12;               // output range of X or Y movement
+int threshold                       =   range/18;         // resting threshold  originally -> /10
+int center                          =   range/2;          // resting position value
+int minima[]                        =   {0, -40};         // actual analogRead minima for {x, y}
+int maxima[]                        =   {0, 40};          // actual analogRead maxima for {x, y}
 
 //Version tag
 private const String VERSION_TAG = "v1";
@@ -50,7 +53,9 @@ void setup()
     }
     
     //Tell the computer/connected device that we are recalibrating
-    Serial.println("RESET" + "," + orientation.heading + "," + orientation.pitch + "," + orientation.roll);    
+    Serial.println("RESET" + "," + orientation.heading + "," + orientation.pitch + "," + orientation.roll + "," 
+                    + range + "," + threshold + "," + center + "," 
+                    + minima[0] + "," + minima[1] + "," + maxima[0] + "," + maxima[1]);    
 }                
  
  
