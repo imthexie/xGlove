@@ -63,7 +63,7 @@ void loop()
 { 
     readLocationSensors();
     readFlexSensors();
-    Serial.println(VERSION_TAG + "," +  orientation.heading + "," + orientation.pitch + "," + orientation.roll + "," + index_top_val + "," + index_side1_val + "," + index_side2_val + "," + middle_val + "," + ring_val;
+    Serial.println(VERSION_TAG + "," +  orientation.heading + "," + orientation.pitch + "," + orientation.roll + "," + index_top_val + "," + index_side1_val + "," + index_side2_val + "," + middle_val + "," + ring_val);
     
     //Maybe put in delay
     
