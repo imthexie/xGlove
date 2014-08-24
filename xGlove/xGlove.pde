@@ -45,10 +45,11 @@ void serialEvent(Serial p) {
       float orientationHeading = Float.parseFloat(data[2].trim()); 
       float orientationRoll = Float.parseFloat(data[3].trim());
       
-      int index = Integer.parseInt(data[4].trim());
-      int middle = Integer.parseInt(data[5].trim());
-      int ring = Integer.parseInt(data[6].trim());
-      int pinky = Integer.parseInt(data[7].trim());
+      int thumb  =  Integer.parseInt(data[4].trim());
+      int index  =  Integer.parseInt(data[5].trim());
+      int middle =  Integer.parseInt(data[6].trim());
+      int ring   =  Integer.parseInt(data[7].trim());
+      int pinky  =  Integer.parseInt(data[8].trim());
             
       dispatcher.updateSensorValues(orientationPitch, orientationHeading, orientationRoll, index, middle, ring, pinky);
       
