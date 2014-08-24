@@ -20,7 +20,6 @@ static const int ringFingerPin             =   A2;
 static const int middleFingerPin           =   A1;
 static const int pinkyPin                  =   A0;
 
-
 /* These global variables indicate the current analogRead values
  * of each fingers, four fingers and all fingers.
  */
