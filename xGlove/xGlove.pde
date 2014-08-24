@@ -51,11 +51,11 @@ void serialEvent(Serial p) {
       int ring   =  Integer.parseInt(data[7].trim());
       int pinky  =  Integer.parseInt(data[8].trim());
             
-      dispatcher.updateSensorValues(orientationPitch, orientationHeading, orientationRoll, index, middle, ring, pinky);
+      dispatcher.updateSensorValues(orientationPitch, orientationHeading, orientationRoll, thumb, index, middle, ring, pinky);
       
       if(DEBUG) {
         println("Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
-        println("FLex sensors: " + "index" + ", " + middle + ", " + ring + ", " + pinky);
+        println("FLex sensors: " + "thumb" + "," + "index" + ", " + middle + ", " + ring + ", " + pinky);
       }
     }
     catch (Throwable t) {
