@@ -4,31 +4,38 @@
 #include <Adafruit_9DOF.h>
 
 /* Assign a unique ID to the sensors */
-static Adafruit_9DOF                 dof   = Adafruit_9DOF();
-static Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
-static Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
+static Adafruit_9DOF                 dof    =  Adafruit_9DOF();
+static Adafruit_LSM303_Accel_Unified accel  =  Adafruit_LSM303_Accel_Unified(30301);
+static Adafruit_LSM303_Mag_Unified   mag    =  Adafruit_LSM303_Mag_Unified(30302);
 
 /* Global Variables for Accelerometer, Gyroscope, Magnetometer */ 
 static sensors_event_t accel_event;
 static sensors_event_t mag_event;
 static sensors_vec_t   orientation;
 
-/* Analog Input Pins corresponding to each finger */
-const int ring         = A0;
-const int middle       = A1;
-const int index_top    = A2;
-const int index_side1  = A3;
-const int index_side2  = A4; 
+ /* Analog Input Pins corresponding to each finger */
+static const int thumbPin                  =   A4;
+static const int indexFingerPin            =   A3; 
+static const int ringFingerPin             =   A2;
+static const int middleFingerPin           =   A1;
+static const int pinkyPin                  =   A0;
 
-/*Finger flex sensor values*/
-int middle_val, ring_val, index_top_val, index_side1_val, index_side2_val; 
+
+/* These global variables indicate the current analogRead values
+ * of each fingers, four fingers and all fingers.
+ */
+static int thumbCurrentValue               =   0;
+static int indexFingerCurrentValue         =   0;
+static int middleFingerCurrentValue        =   0;
+static int ringFingerCurrentValue          =   0;
+static int pinkyCurrentValue               =   0;
 
 //X, Y calibration values
-int range                           =   12;               // output range of X or Y movement
-int threshold                       =   range/18;         // resting threshold  originally -> /10
-int center                          =   range/2;          // resting position value
-int minima[]                        =   {0, -40};         // actual analogRead minima for {x, y}
-int maxima[]                        =   {0, 40};          // actual analogRead maxima for {x, y}
+int range                                  =   12;               // output range of X or Y movement
+int threshold                              =   range/18;         // resting threshold  originally -> /10
+int center                                 =   range/2;          // resting position value
+int minima[]                               =   {0, -40};         // actual analogRead minima for {x, y}
+int maxima[]                               =   {0, 40};          // actual analogRead maxima for {x, y}
 
 //Version tag
 private const String VERSION_TAG = "v1";
@@ -63,26 +70,28 @@ void loop()
 { 
     readLocationSensors();
     readFlexSensors();
-    Serial.println(VERSION_TAG + "," +  orientation.heading + "," + orientation.pitch + "," + orientation.roll + "," + index_top_val + "," + index_side1_val + "," + index_side2_val + "," + middle_val + "," + ring_val);
+    Serial.println(VERSION_TAG + "," +  orientation.heading + "," + orientation.pitch + "," + orientation.roll + "," + thumbCurrentValue + "," + indexFingerCurrentValue + "," + middleFingerCurrentValue + "," + ringFingerCurrentValue + "," + pinkyCurrentValue);
     
     //Maybe put in delay
     
 } 
 
-void readLocationSensors() {
+void readLocationSensors() 
+{
   /* Read the accelerometer and magnetometer */
     accel.getEvent(&accel_event);
     mag.getEvent(&mag_event);
     dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);  //merge accel/mag data
 }
 
-void readFlexSensors() {
+void readFlexSensors() 
+{
     //Check finger flex values
-    middle_val = analogRead(middle);
-    ring_val = analogRead(ring);
-    index_top_val = analogRead(index_top);
-    index_side1_val = analogRead(index_side1);
-    index_side2_val = analogRead(index_side2);   
+    thumbCurrentValue           = analogRead(thumbPin);
+    indexFingerCurrentValue     = analogRead(indexFingerPin);
+    middleFingerCurrentValue    = analogRead(middleFingerPin);
+    ringFingerCurrentValue      = analogRead(ringFingerpin);
+    pinkyCurrentValue           = analogRead(pinkyPin);
 }
 
 /* Function: initSensors
@@ -140,16 +149,20 @@ typedef struct
 */
 
 //struct sensors_vec_t is used to return a vector in a common format. (My calculation is that this is 14 bytes)
-/*typedef struct {
-    union {
+/*typedef struct 
+{
+    union 
+    {
         float v[3];
-        struct {
+        struct 
+        {
             float x;
             float y;
             float z;
         };
          Orientation sensors 
-        struct {
+        struct 
+        {
             float roll;    < Rotation around the longitudinal axis (the plane body, 'X axis'). Roll is positive and increasing when moving downward. -90°<=roll<=90° 
             float pitch;   < Rotation around the lateral axis (the wing span, 'Y axis'). Pitch is positive and increasing when moving upwards. -180°<=pitch<=180°) 
             float heading; < Angle between the longitudinal axis (the plane body) and magnetic north, measured clockwise when viewing from the top of the device. 0-359° 
