@@ -38,7 +38,7 @@ public class xGloveController extends PApplet{
 	public void draw() {}
 	
 	public void keyPressed() {
-		if(keyCode == ESC) {
+		if(key == ESC) {
 			exit();
 		}
 	}
