@@ -30,11 +30,15 @@ class xGloveDispatcher {
     //Thread Pool that takes care of the events 
     private ExecutorService threadPool;
     private ExecutorService dispatcherThread;
+    
+    //Boolean for if the dispatcher is on a blocking action, don't fire events.
+    private volatile boolean dispatcherBlocked;
 
     //Public methods
     public xGloveDispatcher() {
     	//Dispatcher thread that waits for events
     	dispatcherThread = Executors.newFixedThreadPool(1);
+    	dispatcherBlocked = false;
     	
         //Tweak the number of threads here
         threadPool = Executors.newFixedThreadPool(3);
@@ -55,7 +59,7 @@ class xGloveDispatcher {
 
         sensor.updateOrientation(orientationPitch, orientationHeading, orientationRoll);
         sensor.updateFlexValues(indexVal, middleVal, ringVal, pinkyVal);
-        dispatcherThread.execute(dispatcherEvent);
+        if(!dispatcherBlocked) dispatcherThread.execute(dispatcherEvent);
     }
 
     public void dispatchEvents() {
@@ -75,19 +79,23 @@ class xGloveDispatcher {
 
         //Scrolling is a blocking function. No Thread pool
         if(gesture.isScrollModeGesture()) {
+        	dispatcherBlocked = true;
             mouse.mouseScroll();
         }
 
         //Mac launchpad is a blocking function
         if(gesture.upsideDown()) {
+        	dispatcherBlocked = true;
             keyboard.doMacLaunchpad();
         }
 
         //Load next and previous slide is also blocking
         if(gesture.isLoadNextGesture()) {
+        	dispatcherBlocked = true;
             keyboard.doLoadNext();
         } 
         else if (gesture.isLoadPreviousGesture()) {
+        	dispatcherBlocked = true;
             keyboard.doLoadPrevious();
         }
     };
