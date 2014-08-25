@@ -35,7 +35,8 @@ class xGloveDispatcher {
     private volatile boolean dispatcherBlocked;
 
     //Public methods
-    public xGloveDispatcher() {
+    public xGloveDispatcher() 
+    {
     	//Dispatcher thread that waits for events
     	dispatcherThread = Executors.newFixedThreadPool(1);
     	dispatcherBlocked = false;
@@ -54,7 +55,8 @@ class xGloveDispatcher {
     };
 
     public void updateSensorValues(float orientationPitch, float orientationHeading, float orientationRoll, 
-                                    int indexVal, int middleVal, int ringVal, int pinkyVal) {
+                                    int indexVal, int middleVal, int ringVal, int pinkyVal) 
+    {
     	if(xGloveController.DEBUG) System.out.println("Updating Sensors");
 
         sensor.updateOrientation(orientationPitch, orientationHeading, orientationRoll);
@@ -78,89 +80,108 @@ class xGloveDispatcher {
         }
 
         //Scrolling is a blocking function. No Thread pool
-        if(gesture.isScrollModeGesture()) {
+        if(gesture.isScrollModeGesture()) 
+        {
         	dispatcherBlocked = true;
             mouse.mouseScroll();
-        }
-
-        //Mac launchpad is a blocking function
-        if(gesture.upsideDown()) {
+        } 
+        else if(gesture.upsideDown()) 
+        {
+            //Mac launchpad is a blocking function
         	dispatcherBlocked = true;
             keyboard.doMacLaunchpad();
         }
-
-        //Load next and previous slide is also blocking
-        if(gesture.isLoadNextGesture()) {
+        else if(gesture.isLoadNextGesture()) 
+        {
+            //Load next and previous slide is also blocking
         	dispatcherBlocked = true;
             keyboard.doLoadNext();
         } 
-        else if (gesture.isLoadPreviousGesture()) {
+        else if (gesture.isLoadPreviousGesture()) 
+        {
         	dispatcherBlocked = true;
             keyboard.doLoadPrevious();
         }
+        else {
+            dispatcherBlocked = false;
+        }
     };
 
-    public static xGloveSensor getSensor() {return sensor;}
+    public static xGloveSensor getSensor() 
+    { 
+        return sensor; 
+    }
 
     /**Thread jobs**/
     
-    private class dispatcherEvent implements Runnable {
+    private class dispatcherEvent implements Runnable 
+    {
     	public dispatcherEvent() {}
     	@Override 
-    	public void run() {
+    	public void run() 
+        {
     		dispatchEvents();
     	}
     }
 
     //A Thread job for moving the mouse
-    private class mouseMoveEvent implements Runnable {
-        
+    private class mouseMoveEvent implements Runnable 
+    {  
         public mouseMoveEvent() {}
 
         @Override
-        public void run() {
+        public void run() 
+        {
             mouse.moveMouse();
         }
     }
 
     //A Thread job for moving the mouse
-    private class mouseClickEvent implements Runnable {
-        
+    private class mouseClickEvent implements Runnable 
+    {
         public mouseClickEvent() {}
 
         @Override
-        public void run() {
+        public void run() 
+        {
             mouse.doMouseLeftClick();
         }
     }
 
-    private class mouseClickReleaseEvent implements Runnable {
-
+    private class mouseClickReleaseEvent implements Runnable 
+    {
         public mouseClickReleaseEvent() {}
 
         @Override
-        public void run() {
+        public void run() 
+        {
             mouse.doMouseLeftClickRelease();
         }
     }
 
     public void reset(float orientationPitch, float orientationHeading, float orientationRoll, 
     					int range, int threshold, int center, 
-    					int[] minima, int[] maxima) {
+    					int[] minima, int[] maxima) 
+    {
     	sensor.updateOrientation(orientationPitch, orientationHeading, orientationRoll);
     	mouse.resetMouse(range, threshold, center, minima, maxima);
     }
 
-    public void killExecutor() {
+    public void killExecutor() 
+    {
         threadPool.shutdown();
         //Wait for thread pool to shut down
         while (!threadPool.isTerminated()) {}
     }
 
-    public static void threadSleep(int millis) {
-    	try {
+    public static void threadSleep(int millis) 
+    {
+    	try 
+        {
     		Thread.sleep(millis);
-    	} catch(InterruptedException e) {
+    	} 
+        catch(InterruptedException e) 
+        {
     		System.out.println("Thread interrupted.");
     	}
     }

@@ -2,16 +2,20 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
-class xGloveKeyboard {
+class xGloveKeyboard 
+{
 
 	Robot keyboardRobot;
 
   	xGloveGesture gesture;
 
-	public xGloveKeyboard() {
-		try {
+	public xGloveKeyboard() 
+	{
+		try 
+		{
 			keyboardRobot = new Robot();
-		} catch(AWTException e) {
+		} catch(AWTException e) 
+		{
 			e.printStackTrace();
 		}
 
@@ -19,7 +23,8 @@ class xGloveKeyboard {
 	}
 
     
-	public void doSpacebar() {
+	public void doSpacebar() 
+	{
 		keyboardRobot.keyPress(KeyEvent.VK_SPACE);
 		keyboardRobot.keyRelease(KeyEvent.VK_SPACE);
 	}
@@ -33,13 +38,15 @@ class xGloveKeyboard {
 	 * during initial tests of the glove. (TEST IF F4 WORKS)
 	 */
 
-	public void doMacLaunchpad(){
+	public void doMacLaunchpad()
+	{
 	    /* enter Launchpad */
         keyboardRobot.keyPress(KeyEvent.VK_F4); 
         keyboardRobot.keyRelease(KeyEvent.VK_F4);     
 
         /* Thread.sleep until glove is back in original position  */
-        while(!gesture.rightSideUp()) {    
+        while(!gesture.rightSideUp()) 
+        {    
             xGloveDispatcher.threadSleep(50);
         }   
 	} 
@@ -53,7 +60,8 @@ class xGloveKeyboard {
 	 * (when browsing), or the next slide is loaded (in MS Powerpoint). 
 	 */
 
-	public void doLoadNext(){
+	public void doLoadNext()
+	{
         // right arrow key
         while(gesture.isLoadNextGesture()) // exit when hand is back in original position
         {
@@ -64,13 +72,13 @@ class xGloveKeyboard {
                 keyboardRobot.keyRelease(KeyEvent.VK_RIGHT);        
                 //Web shortcuts not consistent throughout browsers and OS's
 
-                    
                 xGloveDispatcher.threadSleep(1500);  // Thread.sleep between iterations of this function
              }             
          }        
     }
 
-    public void doLoadPrevious() {
+    public void doLoadPrevious() 
+    {
         while(gesture.isLoadPreviousGesture()) // exit when hand is back in original position
         {
             if(gesture.fingersBent()) //finger should be bend

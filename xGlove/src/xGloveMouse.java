@@ -4,7 +4,8 @@ import java.awt.Robot;
 import java.awt.event.InputEvent;
 import processing.core.*;
 
-class xGloveMouse {
+class xGloveMouse 
+{
   Robot mouseRobot;     // create object from Robot class;
   static final int rate = 4; // multiplier to adjust movement rate
 
@@ -24,11 +25,14 @@ class xGloveMouse {
   private boolean currentlyClicked;
 
 
-  public xGloveMouse() {
-    try {
+  public xGloveMouse() 
+  {
+    try 
+    {
       mouseRobot = new Robot();
     }
-    catch (AWTException e) {
+    catch (AWTException e) 
+    {
       e.printStackTrace();
     }
 
@@ -46,18 +50,21 @@ class xGloveMouse {
   }
 
   // method to move mouse from current posistion by given offset
-  private void move(int offsetX, int offsetY) {
+  private void move(int offsetX, int offsetY) 
+  {
     x += (rate * offsetX);
     y += (rate * offsetY);
     mouseRobot.mouseMove(x, y);
   }
   
   //Move mouse to a specified location
-  private void moveTo(int posX, int posY) {
+  private void moveTo(int posX, int posY) 
+  {
     mouseRobot.mouseMove(posX, posY);
   }
  
-  public void centerMouse() {
+  public void centerMouse() 
+  {
     //Put mouse in middle of screen
     y =  (int)screen.getHeight() / 2 ;
     x =  (int)screen.getWidth() / 2;
@@ -75,25 +82,31 @@ class xGloveMouse {
    * then becomes zero). 
    */ 
 
-  public boolean isCurrentlyClicked() {return currentlyClicked;}
+  public boolean isCurrentlyClicked() 
+  { 
+    return currentlyClicked; 
+  }
 
-  public void doMouseLeftClick() {        
-    mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);  // left click 
+  public void doMouseLeftClick() 
+  {        
+    mouseRobot.mousePress(InputEvent.BUTTON1_DOWNMASK);  // left click 
     currentlyClicked = true;    // there is a left click
   }  
 
-  public void doMouseLeftClickRelease() {
-    mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release click
+  public void doMouseLeftClickRelease() 
+  {
+    mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWNMASK); //release click
     currentlyClicked = false;   // there is no left click 
   }
 
-    /* Function: move_mouse
+    /* Function: moveMouse
    * --------------------
    * This function uses the data from the 9-DOF chip to move the mouse cursor. 
    * The function calls the readAxis function to turn the position of the 
    * glove into a corresponding position of the mouse cursor on the screen. 
    */
-  public void moveMouse(){
+  public void moveMouse()
+  {
     int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
     int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
 
@@ -137,7 +150,8 @@ class xGloveMouse {
    * scrolling speed. The scrolling speed is controlled by the for loop. 
    */
 
-  public void mouseScroll(){
+  public void mouseScroll()
+  {
     /* delay until user stretches ring finger again */
     while(gesture.isReleaseScrollModeGesture()) xGloveDispatcher.threadSleep(50);
           
@@ -156,13 +170,15 @@ class xGloveMouse {
       }
           
       /* delay until user stretches ring finger again */
-      while(!gesture.isReleaseScrollModeGesture()) {
+      while(!gesture.isReleaseScrollModeGesture()) 
+      {
     	  xGloveDispatcher.threadSleep(20);
       }
     }
   }
   
-  public void resetMouse(int range, int threshold, int center, int[] minima, int[] maxima) {
+  public void resetMouse(int range, int threshold, int center, int[] minima, int[] maxima) 
+  {
 	  this.range = range;
 	  this.threshold = threshold;
 	  this.center = center;
@@ -173,9 +189,9 @@ class xGloveMouse {
 	  centerMouse();
   }
   
-  private long map(long x, long in_min, long in_max, long out_min, long out_max)
+  private long map(long x, long inMin, long inMax, long outMin, long outMax)
   {
-	  if(in_max - in_min == 0) return 0;
-	  return (long)((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+	  if(inMax == inMin) return 0;
+	  return (long)((x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin);
   }
 }

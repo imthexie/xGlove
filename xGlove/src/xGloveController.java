@@ -1,11 +1,13 @@
 import processing.core.*;
 import processing.serial.*;
 	
-public class xGloveController extends PApplet{
+public class xGloveController extends PApplet
+{
 	//Used for tracking versions of this class. Eclipse complains about not declaring this for some reason.
 	private static final long serialVersionUID = 1L;
 	
-	public static void main(String args[]) {
+	public static void main(String args[]) 
+	{
 	    PApplet.main(new String[] {"xGloveController" });
 	}
 	
@@ -19,15 +21,20 @@ public class xGloveController extends PApplet{
 	//Set this to false to not log message receipts
 	public static boolean DEBUG = true;
 
-	public void setup() {
+	public void setup() 
+	{
 	  println(Serial.list());
 	  println(" Connecting to -> " + Serial.list()[portIndex]);
 	  
-	  while(true) {
-		try {
+	  while(true) 
+	  {
+		try 
+		{
 			myPort = new Serial(this,Serial.list()[portIndex], 115200);
 			break;
-	 	} catch(Exception e) {
+	 	} 
+	 	catch(Exception e) 
+	 	{
 	 		//Wait and try again
 	 		delay(1000);
 	 	}
@@ -37,21 +44,26 @@ public class xGloveController extends PApplet{
 
 	public void draw() {}
 	
-	public void keyPressed() {
-		if(key == ESC) {
+	public void keyPressed() 
+	{
+		if(key == ESC) 
+		{
 			exit();
 		}
 	}
 
-	public void serialEvent(Serial p) {
+	public void serialEvent(Serial p) 
+	{
 	  String message = myPort.readStringUntil(LF); // read serial data
 	  if(message != null)
 	  {
 	    if(DEBUG) println("Raw: " + message);
 	    String[] data  = message.split(","); // Split the comma-separated message
 
-	    try {
-	      if("RESET".equals(data[0])) {
+	    try 
+	    {
+	      if("RESET".equals(data[0])) 
+	      {
 	    	  float orientationPitch = Float.parseFloat(data[1].trim());  
 	    	  float orientationHeading = Float.parseFloat(data[2].trim()); 
 	    	  float orientationRoll = Float.parseFloat(data[3].trim());
@@ -70,7 +82,9 @@ public class xGloveController extends PApplet{
 	    			  			range, threshold, center, 
 	    			  			minima, maxima);	
 	    	  return;
-	      } else if(!"v1".equals(data[0])) {
+	      } 
+	      else if(!"v1".equals(data[0])) 
+	      {
 	        throw new Exception("Data header was not recognized");
 	      }
 
@@ -85,12 +99,14 @@ public class xGloveController extends PApplet{
 	            
 	      dispatcher.updateSensorValues(orientationPitch, orientationHeading, orientationRoll, index, middle, ring, pinky);
 	      
-	      if(DEBUG) {
+	      if(DEBUG) 
+	      {
 	        println("Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
 	        println("FLex sensors: " + index + ", " + middle + ", " + ring + ", " + pinky);
 	      }
 	    }
-	    catch (Throwable t) {
+	    catch (Throwable t) 
+	    {
 	      println("Parse Error : " + message); // parse error
 	      println(t.getMessage()); //Print error message
 	    }      
