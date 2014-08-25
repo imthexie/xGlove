@@ -1,5 +1,6 @@
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 
 /**
 * Event Dispatcher that is meant to be run inside a firmware 
@@ -11,6 +12,8 @@ import java.util.concurrent.Executors;
 **/
 
 class xGloveDispatcher {
+	
+	//Dispatcher Event to dispatch events upon
 
     //Finger and sensor values. TODO: Investigate need to use Atomic for concurrency
     public static xGloveSensor sensor;
@@ -22,13 +25,17 @@ class xGloveDispatcher {
     private mouseMoveEvent mouseMoveEvent;
     private mouseClickEvent mouseClickEvent;
     private mouseClickReleaseEvent mouseClickReleaseEvent;
-
+    private dispatcherEvent dispatcherEvent;
+    
     //Thread Pool that takes care of the events 
     private ExecutorService threadPool;
-
+    private ExecutorService dispatcherThread;
 
     //Public methods
     public xGloveDispatcher() {
+    	//Dispatcher thread that waits for events
+    	dispatcherThread = Executors.newFixedThreadPool(1);
+    	
         //Tweak the number of threads here
         threadPool = Executors.newFixedThreadPool(3);
         sensor = new xGloveSensor();
@@ -39,15 +46,22 @@ class xGloveDispatcher {
         mouseMoveEvent = new mouseMoveEvent();
         mouseClickEvent = new mouseClickEvent();
         mouseClickReleaseEvent = new mouseClickReleaseEvent();
+        dispatcherEvent = new dispatcherEvent();
     };
 
     public void updateSensorValues(float orientationPitch, float orientationHeading, float orientationRoll, 
                                     int indexVal, int middleVal, int ringVal, int pinkyVal) {
+    	if(xGloveController.DEBUG) System.out.println("Updating Sensors");
+
         sensor.updateOrientation(orientationPitch, orientationHeading, orientationRoll);
         sensor.updateFlexValues(indexVal, middleVal, ringVal, pinkyVal);
+        dispatcherThread.execute(dispatcherEvent);
     }
 
     public void dispatchEvents() {
+    	
+    	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
+    	
         //Always try to move the mouse for now
         threadPool.execute(mouseMoveEvent);
 
@@ -81,6 +95,14 @@ class xGloveDispatcher {
     public static xGloveSensor getSensor() {return sensor;}
 
     /**Thread jobs**/
+    
+    private class dispatcherEvent implements Runnable {
+    	public dispatcherEvent() {}
+    	@Override 
+    	public void run() {
+    		dispatchEvents();
+    	}
+    }
 
     //A Thread job for moving the mouse
     private class mouseMoveEvent implements Runnable {

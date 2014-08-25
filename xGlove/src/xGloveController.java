@@ -1,11 +1,9 @@
-import java.awt.AWTException;
-import java.awt.Dimension;
 import processing.core.*;
 import processing.serial.*;
 	
 public class xGloveController extends PApplet{
-	/* WARNING: This sketch takes over the mouse
-	 Press escape to close running sketch */
+	//Used for tracking versions of this class. Eclipse complains about not declaring this for some reason.
+	private static final long serialVersionUID = 1L;
 	
 	public static void main(String args[]) {
 	    PApplet.main(new String[] {"xGloveController" });
@@ -17,21 +15,33 @@ public class xGloveController extends PApplet{
 	public static final short portIndex = 0;  // select the com port, 
 	                                          // 0 is the first port
 	xGloveDispatcher dispatcher;
-	DispatcherThread dispatcherThread;
 
 	//Set this to false to not log message receipts
-	boolean DEBUG = true;
+	public static boolean DEBUG = true;
 
 	public void setup() {
 	  println(Serial.list());
 	  println(" Connecting to -> " + Serial.list()[portIndex]);
-	  myPort = new Serial(this,Serial.list()[portIndex], 115200);
+	  
+	  while(true) {
+		try {
+			myPort = new Serial(this,Serial.list()[portIndex], 115200);
+			break;
+	 	} catch(Exception e) {
+	 		//Wait and try again
+	 		delay(1000);
+	 	}
+	  }
 	  dispatcher = new xGloveDispatcher(); 
-	  dispatcherThread = new DispatcherThread(dispatcher, 0);
-	  dispatcherThread.start();
 	}
 
 	public void draw() {}
+	
+	public void keyPressed() {
+		if(keyCode == ESC) {
+			exit();
+		}
+	}
 
 	public void serialEvent(Serial p) {
 	  String message = myPort.readStringUntil(LF); // read serial data
@@ -81,51 +91,9 @@ public class xGloveController extends PApplet{
 	      }
 	    }
 	    catch (Throwable t) {
-	      println("Parse Error :" + message); // parse error
+	      println("Parse Error : " + message); // parse error
+	      println(t.getMessage()); //Print error message
 	    }      
-	  }
-	}
-
-	class DispatcherThread extends Thread {
-	 
-	  volatile boolean running;           // Is the thread running?  Yes or no?
-	  int wait;                  // How many milliseconds should we wait in between executions?
-	  xGloveDispatcher dispatcher;
-	  // Constructor, create the thread
-	  // It is not running by default
-	  DispatcherThread(xGloveDispatcher dispatcher, int waitTime) {
-	    wait = waitTime;
-	    running = false;
-	    this.dispatcher = dispatcher;
-	  }
-	 
-	  // Overriding "start()"
-	  public void start() {
-	    // Set running equal to true
-	    running = true;
-	    super.start();
-	  }
-	 
-	 
-	  // We must implement run, this gets triggered by start()
-	  public void run() {
-	    while (running) {
-	      dispatcher.dispatchEvents();
-	      try {
-	    	  Thread.sleep(wait);
-	      } catch(InterruptedException e) {
-	    	  e.printStackTrace();
-	      }
-	    }
-	  }
-	 
-	 
-	  //Quits the thread
-	  public void quit() {
-	    System.out.println("Quitting."); 
-	    running = false;  // Setting running to false ends the loop in run()
-	    dispatcher.killExecutor();
-	    interrupt();
 	  }
 	}
 }
