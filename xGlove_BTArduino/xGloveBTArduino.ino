@@ -46,7 +46,7 @@ const String VERSION_TAG = "v1";
 
 void setup() 
 {
-    Serial.begin(115200);
+    Serial1.begin(115200);
     
     /* Initialise the sensors */ 
     initSensors(); 
@@ -64,7 +64,7 @@ void setup()
     }
     
     // Tell the computer/connected device that we are recalibrating
-    Serial.println("RESET" + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+    Serial1.println("RESET" + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
                      minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);    
 }                
 
@@ -73,7 +73,7 @@ void loop()
 { 
     readLocationSensors();
     readFlexSensors();
-    Serial.println(VERSION_TAG + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+    Serial1.println(VERSION_TAG + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
                     thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
                     ringFingerCurrentValue + ',' + pinkyCurrentValue);
     delay(1);
@@ -108,13 +108,13 @@ void initSensors()
     if(!accel.begin())
     {
         /* There was a problem detecting the LSM303 ... check your connections */
-        Serial.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
+        Serial1.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
         while(1);
     }
     if(!mag.begin())
     {
         /* There was a problem detecting the LSM303 ... check your connections */
-        Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
+        Serial1.println("Ooops, no LSM303 detected ... Check your wiring!");
         while(1);
     } 
 }
