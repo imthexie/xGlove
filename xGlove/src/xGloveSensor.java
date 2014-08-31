@@ -36,11 +36,11 @@ class xGloveSensor
 		this.pinkyVal = pinkyVal;
 	}
 
-	public void updateOrientation(float pitch, float heading, float roll) 
+	public void updateOrientation(float roll, float pitch, float heading) 
 	{
+	    orientation.roll = roll;
 	    orientation.pitch = pitch;
 	    orientation.heading = heading;
-	    orientation.roll = roll;
   	}
 
 	public boolean isFingerBent(Finger finger, double percentageBent) 

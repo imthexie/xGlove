@@ -64,9 +64,9 @@ public class xGloveController extends PApplet
 	    {
 	      if("RESET".equals(data[0])) 
 	      {
-	    	  float orientationPitch = Float.parseFloat(data[1].trim());  
-	    	  float orientationHeading = Float.parseFloat(data[2].trim()); 
-	    	  float orientationRoll = Float.parseFloat(data[3].trim());
+	    	  float orientationRoll = Float.parseFloat(data[1].trim());  
+	    	  float orientationPitch = Float.parseFloat(data[2].trim()); 
+	    	  float orientationHeading = Float.parseFloat(data[3].trim());
 	    	  
 	    	  int minima[] = {0, -40};         // actual analogRead minima for {x, y}
 	    	  int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
@@ -75,7 +75,7 @@ public class xGloveController extends PApplet
 	    	  maxima[0] = Integer.parseInt(data[6].trim());
 	    	  maxima[1] = Integer.parseInt(data[7].trim());
 	    	  
-	    	  dispatcher.reset(orientationPitch, orientationHeading, orientationRoll, 
+	    	  dispatcher.reset(orientationRoll, orientationPitch, orientationHeading, 
 	    			  			minima, maxima);	
 	    	  return;
 	      } 
@@ -83,10 +83,9 @@ public class xGloveController extends PApplet
 	      {
 	        throw new Exception("Data header was not recognized");
 	      }
-
-	      float orientationPitch = Float.parseFloat(data[1].trim());  
-    	  float orientationHeading = Float.parseFloat(data[2].trim()); 
-    	  float orientationRoll = Float.parseFloat(data[3].trim());
+	      float orientationRoll = Float.parseFloat(data[1].trim());  
+	      float orientationPitch = Float.parseFloat(data[2].trim());
+	      float orientationHeading = Float.parseFloat(data[3].trim());
 	      
     	  int thumb = Integer.parseInt(data[4].trim());
 	      int index = Integer.parseInt(data[5].trim());
@@ -94,7 +93,7 @@ public class xGloveController extends PApplet
 	      int ring = Integer.parseInt(data[7].trim());
 	      int pinky = Integer.parseInt(data[8].trim());
 	            
-	      dispatcher.updateSensorValues(orientationPitch, orientationHeading, orientationRoll, thumb, index, middle, ring, pinky);
+	      dispatcher.updateSensorValues(orientationRoll, orientationPitch, orientationHeading, thumb, index, middle, ring, pinky);
 	      
 	      if(DEBUG) 
 	      {
