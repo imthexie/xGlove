@@ -64,22 +64,18 @@ public class xGloveController extends PApplet
 	    {
 	      if("RESET".equals(data[0])) 
 	      {
-	    	  float orientationPitch = Float.parseFloat(data[1].trim());  
-	    	  float orientationHeading = Float.parseFloat(data[2].trim()); 
-	    	  float orientationRoll = Float.parseFloat(data[3].trim());
+	    	  float orientationRoll = Float.parseFloat(data[1].trim());  
+	    	  float orientationPitch = Float.parseFloat(data[2].trim()); 
+	    	  float orientationHeading = Float.parseFloat(data[3].trim());
 	    	  
-	    	  int range = Integer.parseInt(data[4].trim());               // output range of X or Y movement
-	    	  int threshold = Integer.parseInt(data[5].trim());         // resting threshold  originally -> /10
-	    	  int center = Integer.parseInt(data[6].trim());          // resting position value
 	    	  int minima[] = {0, -40};         // actual analogRead minima for {x, y}
 	    	  int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
-	    	  minima[0] = Integer.parseInt(data[7].trim());
-	    	  minima[1] = Integer.parseInt(data[8].trim());
-	    	  maxima[0] = Integer.parseInt(data[9].trim());
-	    	  maxima[1] = Integer.parseInt(data[10].trim());
+	    	  minima[0] = Integer.parseInt(data[4].trim());
+	    	  minima[1] = Integer.parseInt(data[5].trim());
+	    	  maxima[0] = Integer.parseInt(data[6].trim());
+	    	  maxima[1] = Integer.parseInt(data[7].trim());
 	    	  
-	    	  dispatcher.reset(orientationPitch, orientationHeading, orientationRoll, 
-	    			  			range, threshold, center, 
+	    	  dispatcher.reset(orientationRoll, orientationPitch, orientationHeading, 
 	    			  			minima, maxima);	
 	    	  return;
 	      } 
@@ -87,17 +83,17 @@ public class xGloveController extends PApplet
 	      {
 	        throw new Exception("Data header was not recognized");
 	      }
-
-	      float orientationPitch = Float.parseFloat(data[1].trim());  
-    	  float orientationHeading = Float.parseFloat(data[2].trim()); 
-    	  float orientationRoll = Float.parseFloat(data[3].trim());
+	      float orientationRoll = Float.parseFloat(data[1].trim());  
+	      float orientationPitch = Float.parseFloat(data[2].trim());
+	      float orientationHeading = Float.parseFloat(data[3].trim());
 	      
-	      int index = Integer.parseInt(data[4].trim());
-	      int middle = Integer.parseInt(data[5].trim());
-	      int ring = Integer.parseInt(data[6].trim());
-	      int pinky = Integer.parseInt(data[7].trim());
+    	  int thumb = Integer.parseInt(data[4].trim());
+	      int index = Integer.parseInt(data[5].trim());
+	      int middle = Integer.parseInt(data[6].trim());
+	      int ring = Integer.parseInt(data[7].trim());
+	      int pinky = Integer.parseInt(data[8].trim());
 	            
-	      dispatcher.updateSensorValues(orientationPitch, orientationHeading, orientationRoll, index, middle, ring, pinky);
+	      dispatcher.updateSensorValues(orientationRoll, orientationPitch, orientationHeading, thumb, index, middle, ring, pinky);
 	      
 	      if(DEBUG) 
 	      {

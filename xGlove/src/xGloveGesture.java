@@ -76,12 +76,12 @@ class xGloveGesture
 
     public boolean isScrollModeGesture() 
     {
-        return sensor.ringFingerBent(90) && !(sensor.middleFingerBent(50)) && !(sensor.indexFingerBent(50));
+        return sensor.isFingerBent(Finger.RING, 90) && !(sensor.isFingerBent(Finger.MIDDLE, 50)) && !(sensor.isFingerBent(Finger.INDEX, 50));
     }
 
     public boolean isReleaseScrollModeGesture() 
     {
-        return sensor.ringFingerBent(70) && !(sensor.middleFingerBent(50));
+        return sensor.isFingerBent(Finger.RING, 70) && !(sensor.isFingerBent(Finger.MIDDLE, 50));
     }
 
     public boolean isLoadNextGesture() 

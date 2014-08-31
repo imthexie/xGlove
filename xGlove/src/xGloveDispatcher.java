@@ -54,13 +54,13 @@ class xGloveDispatcher {
         dispatcherEvent = new dispatcherEvent();
     };
 
-    public void updateSensorValues(float orientationPitch, float orientationHeading, float orientationRoll, 
-                                    int indexVal, int middleVal, int ringVal, int pinkyVal) 
+    public void updateSensorValues(float orientationRoll, float orientationPitch, float orientationHeading, 
+                                    int thumbVal, int indexVal, int middleVal, int ringVal, int pinkyVal) 
     {
     	if(xGloveController.DEBUG) System.out.println("Updating Sensors");
 
-        sensor.updateOrientation(orientationPitch, orientationHeading, orientationRoll);
-        sensor.updateFlexValues(indexVal, middleVal, ringVal, pinkyVal);
+        sensor.updateOrientation(orientationRoll, orientationPitch, orientationHeading);
+        sensor.updateFlexValues(thumbVal, indexVal, middleVal, ringVal, pinkyVal);
         if(!dispatcherBlocked) dispatcherThread.execute(dispatcherEvent);
     }
 
@@ -159,12 +159,11 @@ class xGloveDispatcher {
         }
     }
 
-    public void reset(float orientationPitch, float orientationHeading, float orientationRoll, 
-    					int range, int threshold, int center, 
+    public void reset(float orientationRoll, float orientationPitch, float orientationHeading, 
     					int[] minima, int[] maxima) 
     {
-    	sensor.updateOrientation(orientationPitch, orientationHeading, orientationRoll);
-    	mouse.resetMouse(range, threshold, center, minima, maxima);
+    	sensor.updateOrientation(orientationRoll, orientationPitch, orientationHeading);
+    	mouse.resetMouse(minima, maxima);
     }
 
     public void killExecutor() 

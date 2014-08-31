@@ -7,15 +7,16 @@ import processing.core.*;
 class xGloveMouse 
 {
   Robot mouseRobot;     // create object from Robot class;
-  static final int rate = 4; // multiplier to adjust movement rate
+  private static final int xRate = 5;
+  private static final int yRate = 4; // multiplier to adjust movement rate
 
   xGloveGesture gesture;
 
   Dimension screen; //Computer screen data
   
-  int range;
-  int threshold;
-  int center;
+  int range = 12;               // output range of X or Y movement
+  int threshold = range / 18;         // resting threshold  originally -> /10
+  int center = range / 2;          // resting position value
   int minima[] = {0, -40};         // actual analogRead minima for {x, y}
   int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
 
@@ -23,7 +24,6 @@ class xGloveMouse
   int x, y; //coordinates of mouse
 
   private boolean currentlyClicked;
-
 
   public xGloveMouse() 
   {
@@ -49,27 +49,25 @@ class xGloveMouse
     this.gesture = new xGloveGesture();
   }
 
-  // method to move mouse from current posistion by given offset
+  // method to move mouse from current position by given offset
   private void move(int offsetX, int offsetY) 
   {
-    x += (rate * offsetX);
-    y += (rate * offsetY);
-    mouseRobot.mouseMove(x, y);
+	  x += (xRate * offsetX);
+	  y += (yRate * offsetY);
+	  mouseRobot.mouseMove(x, y); //mouseMove moves to a given position
   }
   
   //Move mouse to a specified location
   private void moveTo(int posX, int posY) 
   {
-    mouseRobot.mouseMove(posX, posY);
+	  x = posX;
+	  y = posY;
+	  mouseRobot.mouseMove(posX, posY);
   }
  
   public void centerMouse() 
   {
-    //Put mouse in middle of screen
-    y =  (int)screen.getHeight() / 2 ;
-    x =  (int)screen.getWidth() / 2;
-
-    moveTo(x, y);
+	  moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2);
   }
 
     /* Function: mouse_left_click
@@ -84,19 +82,19 @@ class xGloveMouse
 
   public boolean isCurrentlyClicked() 
   { 
-    return currentlyClicked; 
+	  return currentlyClicked; 
   }
 
   public void doMouseLeftClick() 
   {        
-    mouseRobot.mousePress(InputEvent.BUTTON1_DOWNMASK);  // left click 
-    currentlyClicked = true;    // there is a left click
+	  mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);  // left click 
+	  currentlyClicked = true;    // there is a left click
   }  
 
   public void doMouseLeftClickRelease() 
   {
-    mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWNMASK); //release click
-    currentlyClicked = false;   // there is no left click 
+	  mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release click
+	  currentlyClicked = false;   // there is no left click 
   }
 
     /* Function: moveMouse
@@ -107,11 +105,11 @@ class xGloveMouse
    */
   public void moveMouse()
   {
-    int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
-    int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
+	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
+	  int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
 
-    //TODO: Make this pixel density independent 
-    move(5 * xReading, 4 * yReading);       // move the mouse
+	  //TODO: Make this pixel density independent 
+	  move(xReading, yReading);       // move the mouse
   }
 
     /* Function: get_cursor_position
@@ -152,7 +150,7 @@ class xGloveMouse
 
   public void mouseScroll()
   {
-    /* delay until user stretches ring finger again */
+	  /* delay until user stretches ring finger again */
     while(gesture.isReleaseScrollModeGesture()) xGloveDispatcher.threadSleep(50);
           
     /* while loop will exit when ring finger is bent much more than middle finger */
@@ -177,11 +175,8 @@ class xGloveMouse
     }
   }
   
-  public void resetMouse(int range, int threshold, int center, int[] minima, int[] maxima) 
+  public void resetMouse(int[] minima, int[] maxima) 
   {
-	  this.range = range;
-	  this.threshold = threshold;
-	  this.center = center;
 	  this.minima[0] = minima[0];
 	  this.minima[1] = minima[1];
 	  this.maxima[0] = maxima[0];
