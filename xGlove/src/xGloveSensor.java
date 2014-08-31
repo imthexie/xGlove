@@ -1,11 +1,13 @@
-class xGloveSensor \
+class xGloveSensor 
 {
+	private int thumbBent;
 	private int indexFingerBent;
     private int middleFingerBent;
     private int ringFingerBent;
     private int pinkyBent;
     private int allFingersBent;
   
+    private int thumbVal;
     private int indexVal;
     private int middleVal;
     private int ringVal;  
@@ -15,6 +17,7 @@ class xGloveSensor \
 
 	public xGloveSensor() 
 	{
+		thumbBent = 250;
 	    indexFingerBent  =  250;
 	    middleFingerBent =  250;
 	    ringFingerBent   =  250;
@@ -24,8 +27,9 @@ class xGloveSensor \
 	    orientation = new Orientation();
 	}
 
-	public void updateFlexValues(int indexVal, int middleVal, int ringVal, int pinkyVal) 
+	public void updateFlexValues(int thumbVal, int indexVal, int middleVal, int ringVal, int pinkyVal) 
 	{
+		this.thumbVal = thumbVal;
 		this.indexVal = indexVal;
 		this.middleVal = middleVal;
 		this.ringVal = ringVal;
@@ -39,35 +43,15 @@ class xGloveSensor \
 	    orientation.roll = roll;
   	}
 
-
-	public boolean indexFingerBent(double percentage_bent) 
+	public boolean isFingerBent(Finger finger, double percentageBent) 
 	{
-	    return (indexVal < (percentage_bent/100) * indexFingerBent);
+		return (getFlexValue(finger) < (percentageBent / 100) * getBentValue(finger));
 	}
-
-
-	public boolean middleFingerBent(double percentage_bent)
-	{
-	    return (middleVal < (percentage_bent/100) * middleFingerBent);
-	}
-
-
-	public boolean ringFingerBent(double percentage_bent)
-	{
-	    return (ringVal < (percentage_bent/100) * ringFingerBent);
-	}
-
-
-	public boolean pinkyBent(double percentage_bent)
-	{
-	    return (pinkyVal < (percentage_bent/100) * pinkyBent);
-	}
-
-
-	public boolean allFingersBent(double percentage_bent)
+	
+	public boolean allFingersBent(double percentageBent)
 	{
 	    return indexVal + middleVal + ringVal +
-	            pinkyVal < ((percentage_bent/100) * allFingersBent);
+	            pinkyVal < ((percentageBent/100) * allFingersBent);
 	}
 	
 	public boolean allFingersSpread() 
@@ -80,20 +64,29 @@ class xGloveSensor \
 	    return (indexVal + middleVal + ringVal + pinkyVal); 
 	}
 
-	public enum Finger 
-	{
-        INDEX_TOP, MIDDLE, RING, PINKY;
-    }
-
-    int getFlexValue(Finger finger) 
+    public int getFlexValue(Finger finger) 
     {
         switch(finger) 
         {
-            case INDEX_TOP : return indexVal;
-            case MIDDLE : return middleVal;
-            case RING : return ringVal;
-            case PINKY : return pinkyVal;
-            default : return -1;
+    	case THUMB : return thumbVal;
+        case INDEX : return indexVal;
+        case MIDDLE : return middleVal;
+        case RING : return ringVal;
+        case PINKY : return pinkyVal;
+        default : return -1;
+        }
+    }
+    
+    public int getBentValue(Finger finger) 
+    {
+        switch(finger) 
+        {
+        case THUMB : return thumbBent;
+        case INDEX : return indexFingerBent;
+        case MIDDLE : return middleFingerBent;
+        case RING : return ringFingerBent;
+        case PINKY : return pinkyBent;
+        default : return -1;
         }
     }
 

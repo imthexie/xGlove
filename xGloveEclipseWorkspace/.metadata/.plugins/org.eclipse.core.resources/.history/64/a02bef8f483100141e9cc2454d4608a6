@@ -1,0 +1,4 @@
+public enum Finger 
+{
+    THUMB, INDEX_TOP, MIDDLE, RING, PINKY;
+}

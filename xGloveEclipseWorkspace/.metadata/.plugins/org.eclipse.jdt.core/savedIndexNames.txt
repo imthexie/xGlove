@@ -1,0 +1,19 @@
+INDEX VERSION 1.126+D:\xGlove\xGloveEclipseWorkspace\.metadata\.plugins\org.eclipse.jdt.core
+2626703199.index
+3610607172.index
+4153830298.index
+2501495343.index
+2560255653.index
+1130772774.index
+3557132078.index
+1901574947.index
+3043232061.index
+1973137851.index
+1555506372.index
+4028248364.index
+1981810206.index
+2598313617.index
+2010061089.index
+134549319.index
+356821414.index
+1313456809.index
