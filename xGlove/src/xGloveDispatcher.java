@@ -12,8 +12,8 @@ import java.util.concurrent.Semaphore;
 **/
 
 class xGloveDispatcher {
-	
-	//Dispatcher Event to dispatch events upon
+	//Used in debug logs
+	private final String TAG = "xGloveDispatcher";
 
     //Finger and sensor values. TODO: Investigate need to use Atomic for concurrency
     public static xGloveSensor sensor;
@@ -30,6 +30,7 @@ class xGloveDispatcher {
     //Thread Pool that takes care of the events 
     private ExecutorService threadPool;
     private ExecutorService dispatcherThread;
+    private ExecutorService mouseThread;
     
     //Boolean for if the dispatcher is on a blocking action, don't fire events.
     private volatile boolean dispatcherBlocked;
@@ -41,8 +42,11 @@ class xGloveDispatcher {
     	dispatcherThread = Executors.newFixedThreadPool(1);
     	dispatcherBlocked = false;
     	
+    	//Mouse thread
+    	mouseThread = Executors.newFixedThreadPool(1);
+    	
         //Tweak the number of threads here
-        threadPool = Executors.newFixedThreadPool(3);
+        threadPool = Executors.newFixedThreadPool(2);
         sensor = new xGloveSensor();
         gesture = new xGloveGesture();
         mouse = new xGloveMouse(); //Mouse must be constructed after sensor
@@ -64,46 +68,51 @@ class xGloveDispatcher {
         if(!dispatcherBlocked) dispatcherThread.execute(dispatcherEvent);
     }
 
-    public void dispatchEvents() {
+    public void dispatchEvents() 
+    {
     	
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
         //Always try to move the mouse for now
-        threadPool.execute(mouseMoveEvent);
+        mouseThread.execute(mouseMoveEvent);
 
-        //Mouse click and release
-        if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
-            threadPool.execute(mouseClickEvent); 
-        }
-        else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
-            threadPool.execute(mouseClickReleaseEvent);
-        }
-
-        //Scrolling is a blocking function. No Thread pool
-        if(gesture.isScrollModeGesture()) 
-        {
-        	dispatcherBlocked = true;
-            mouse.mouseScroll();
-        } 
-        else if(gesture.upsideDown()) 
-        {
-            //Mac launchpad is a blocking function
-        	dispatcherBlocked = true;
-            keyboard.doMacLaunchpad();
-        }
-        else if(gesture.isLoadNextGesture()) 
-        {
-            //Load next and previous slide is also blocking
-        	dispatcherBlocked = true;
-            keyboard.doLoadNext();
-        } 
-        else if (gesture.isLoadPreviousGesture()) 
-        {
-        	dispatcherBlocked = true;
-            keyboard.doLoadPrevious();
-        }
-        else {
-            dispatcherBlocked = false;
+        //Wrap anything you don't want to test for now in !DEBUG
+        if(!xGloveController.DEBUG) 
+        { 
+	        //Mouse click and release
+	        if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
+	            threadPool.execute(mouseClickEvent); 
+	        }
+	        else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
+	            threadPool.execute(mouseClickReleaseEvent);
+	        }
+	
+	        //Scrolling is a blocking function. No Thread pool
+	        if(gesture.isScrollModeGesture()) 
+	        {
+	        	dispatcherBlocked = true;
+	            mouse.mouseScroll();
+	        } 
+	        else if(gesture.upsideDown()) 
+	        {
+	            //Mac launchpad is a blocking function
+	        	dispatcherBlocked = true;
+	            keyboard.doMacLaunchpad();
+	        }
+	        else if(gesture.isLoadNextGesture()) 
+	        {
+	            //Load next and previous slide is also blocking
+	        	dispatcherBlocked = true;
+	            keyboard.doLoadNext();
+	        } 
+	        else if (gesture.isLoadPreviousGesture()) 
+	        {
+	        	dispatcherBlocked = true;
+	            keyboard.doLoadPrevious();
+	        }
+	        else {
+	            dispatcherBlocked = false;
+	        }
         }
     };
 
