@@ -1,10 +1,10 @@
 class xGloveGesture 
 {
+	//Used in debug logs
+	private final String TAG = "xGloveGesture";
+	
     private xGloveSensor sensor; //reference to the sensor
-
-    int minima[] = {0, -40};         // actual analogRead minima for {x, y}
-    int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
-
+    
     public xGloveGesture() 
     {
         this.sensor = xGloveDispatcher.getSensor();

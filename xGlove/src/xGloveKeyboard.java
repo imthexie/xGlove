@@ -4,6 +4,8 @@ import java.awt.event.KeyEvent;
 
 class xGloveKeyboard 
 {
+	//Used in debug logs
+	private final String TAG = "xGloveKeyboard";
 
 	Robot keyboardRobot;
 

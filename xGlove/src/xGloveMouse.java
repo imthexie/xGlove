@@ -6,69 +6,72 @@ import processing.core.*;
 
 class xGloveMouse 
 {
-  Robot mouseRobot;     // create object from Robot class;
-  private static final int xRate = 5;
-  private static final int yRate = 4; // multiplier to adjust movement rate
+	//Used in debug logs
+	private final String TAG = "xGloveMouse";
+	Robot mouseRobot;     // create object from Robot class;
+	private static final int xRate = 5;
+	private static final int yRate = 4; // multiplier to adjust movement rate
 
-  xGloveGesture gesture;
+	xGloveGesture gesture;
 
-  Dimension screen; //Computer screen data
+	Dimension screen; //Computer screen data
   
-  int range = 12;               // output range of X or Y movement
-  int threshold = range / 18;         // resting threshold  originally -> /10
-  int center = range / 2;          // resting position value
-  int minima[] = {0, -40};         // actual analogRead minima for {x, y}
-  int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
+	int range = 12;               // output range of X or Y movement
+	int threshold = range / 18;         // resting threshold  originally -> /10
+	int center = range / 2;          // resting position value
+	int minima[] = {0, -40};         // actual analogRead minima for {x, y}
+	int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
 
-  //TODO: Test this, and evaluate need to use AtomicInteger
-  int x, y; //coordinates of mouse
+	//TODO: Test this, and evaluate need to use AtomicInteger
+	int x, y; //coordinates of mouse
 
-  private boolean currentlyClicked;
+	private boolean currentlyClicked;
 
-  public xGloveMouse() 
-  {
-    try 
-    {
-      mouseRobot = new Robot();
-    }
-    catch (AWTException e) 
-    {
-      e.printStackTrace();
-    }
+	public xGloveMouse() 
+	{
+		try 
+		{
+			mouseRobot = new Robot();
+		}
+		catch (AWTException e) 
+		{
+			e.printStackTrace();
+		}
 
-    //Automatic delay after every event fired. TODO: May need adjustment
-    mouseRobot.setAutoDelay(10);
+		//Automatic delay after every event fired. TODO: May need adjustment
+		mouseRobot.setAutoDelay(10);
 
-    screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+		screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 
-    //Put mouse in middle of screen
-    centerMouse();
+		//TODO: check if this is needed vs the call in resetMouse(). 
+		//Put mouse in middle of screen
+		centerMouse();
+		
+		currentlyClicked = false;
 
-    currentlyClicked = false;
+		this.gesture = new xGloveGesture();
+	}
 
-    this.gesture = new xGloveGesture();
-  }
-
-  // method to move mouse from current position by given offset
-  private void move(int offsetX, int offsetY) 
-  {
-	  x += (xRate * offsetX);
-	  y += (yRate * offsetY);
-	  mouseRobot.mouseMove(x, y); //mouseMove moves to a given position
-  }
+	// method to move mouse from current position by given offset
+	private void move(int offsetX, int offsetY) 
+	{
+		x += (xRate * offsetX);
+		y += (yRate * offsetY);
+		mouseRobot.mouseMove(x, y); //mouseMove moves to a given position
+	}
   
-  //Move mouse to a specified location
-  private void moveTo(int posX, int posY) 
-  {
-	  x = posX;
-	  y = posY;
-	  mouseRobot.mouseMove(posX, posY);
-  }
+	//Move mouse to a specified location
+	private void moveTo(int posX, int posY) 
+	{
+		x = posX;
+		y = posY;
+		mouseRobot.mouseMove(posX, posY);
+	}
  
-  public void centerMouse() 
-  {
-	  moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2);
-  }
+	public void centerMouse() 
+	{
+		moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2);
+	}
 
     /* Function: mouse_left_click
    * --------------------------
@@ -80,24 +83,24 @@ class xGloveMouse
    * then becomes zero). 
    */ 
 
-  public boolean isCurrentlyClicked() 
-  { 
-	  return currentlyClicked; 
-  }
+	public boolean isCurrentlyClicked() 
+	{ 
+		return currentlyClicked; 
+	}
 
-  public void doMouseLeftClick() 
-  {        
-	  mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);  // left click 
-	  currentlyClicked = true;    // there is a left click
-  }  
+	public void doMouseLeftClick() 
+	{        
+		mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);  // left click 
+		currentlyClicked = true;    // there is a left click
+	}  
 
-  public void doMouseLeftClickRelease() 
-  {
-	  mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release click
-	  currentlyClicked = false;   // there is no left click 
-  }
-
-    /* Function: moveMouse
+	public void doMouseLeftClickRelease() 
+	{
+		mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release click
+		currentlyClicked = false;   // there is no left click 
+	}
+	
+   /* Function: moveMouse
    * --------------------
    * This function uses the data from the 9-DOF chip to move the mouse cursor. 
    * The function calls the readAxis function to turn the position of the 
@@ -107,7 +110,8 @@ class xGloveMouse
   {
 	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
 	  int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
-
+	  
+	  if(xGloveController.DEBUG) System.out.println(TAG + ": moveMouse() : xReading: " + xReading + " yReading " + yReading);
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
   }
@@ -121,7 +125,8 @@ class xGloveMouse
   private int getCursorPosition(float heading, int axisNumber) 
   {
       int distance = 0;    // distance from center of the output range
-          
+      if(xGloveController.DEBUG) System.out.println(TAG + ": getCursorPosition() : " + "Input heading: " + heading + " Axis: " + axisNumber);
+
       // map the reading from the analog input range to the output range:
       heading = map((int)heading, minima[axisNumber], maxima[axisNumber], 0, range);
       
@@ -132,6 +137,10 @@ class xGloveMouse
       // the reading needs to be inverted in order to 
       // map the movement correctly:
       distance = -distance;
+      
+      if(xGloveController.DEBUG) System.out.println(TAG + ": getCursorPosition() : " + "Returned distance result: " + distance + " Mapped heading: " + heading + 
+				" \nMinima[axisNumber] " + minima[axisNumber] + " Maxima[axisNumber] " + maxima[axisNumber] + "Range: " + range);
+      
 
       // return the distance for this axis:
       return distance;
@@ -182,6 +191,8 @@ class xGloveMouse
 	  this.maxima[0] = maxima[0];
 	  this.maxima[1] = maxima[1];
 	  centerMouse();
+	  if(xGloveController.DEBUG) System.out.println(TAG + ": resetMouse() : " + "Minima[0] : " + this.minima[0] + 
+			  									"Minima[1] : " + this.minima[1] + "\nMaxima[0] : " + this.maxima[0] + "Maxima[1] : " + this.maxima[1]);
   }
   
   private long map(long x, long inMin, long inMax, long outMin, long outMax)

@@ -1,5 +1,8 @@
 class xGloveSensor 
 {
+	//Used in debug logs
+	private final String TAG = "xGloveSensor";
+	
 	private int thumbBent;
 	private int indexFingerBent;
     private int middleFingerBent;
@@ -34,6 +37,8 @@ class xGloveSensor
 		this.middleVal = middleVal;
 		this.ringVal = ringVal;
 		this.pinkyVal = pinkyVal;
+		if(xGloveController.DEBUG) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
+				+ " Index: " + this.indexVal + " Middle: " + this.middleVal + " Ring: " + this.ringVal + " Pinky: " + this.pinkyVal);
 	}
 
 	public void updateOrientation(float roll, float pitch, float heading) 
@@ -41,27 +46,39 @@ class xGloveSensor
 	    orientation.roll = roll;
 	    orientation.pitch = pitch;
 	    orientation.heading = heading;
+	    
+	    if(xGloveController.DEBUG) System.out.println(TAG + " updateOrientation(): " + "Roll: " + orientation.roll 
+	    											+ " Pitch: " + orientation.pitch + " Heading: " + orientation.heading);
   	}
 
 	public boolean isFingerBent(Finger finger, double percentageBent) 
 	{
-		return (getFlexValue(finger) < (percentageBent / 100) * getBentValue(finger));
+		boolean bent = (getFlexValue(finger) < (percentageBent / 100) * getBentValue(finger));
+		if(xGloveController.DEBUG) System.out.println(TAG + " isFingerBent(): " + "Finger : " + finger.toString() + " Is Bent: " + bent); 
+		return bent;
+		
 	}
 	
 	public boolean allFingersBent(double percentageBent)
 	{
-	    return indexVal + middleVal + ringVal +
+		boolean allBent = indexVal + middleVal + ringVal +
 	            pinkyVal < ((percentageBent/100) * allFingersBent);
+		if(xGloveController.DEBUG) System.out.println(TAG + " allFingersBent(): Is Bent: " + allBent); 
+	    return allBent;
 	}
 	
 	public boolean allFingersSpread() 
 	{
-		return !allFingersBent(25);
+		boolean allSpread = !allFingersBent(25);
+		if(xGloveController.DEBUG) System.out.println(TAG + " allFingersSpread(): Is Bent: " + allSpread); 
+		return allSpread;
 	}
 
 	public int getInclinationPercentage()
 	{
-	    return (indexVal + middleVal + ringVal + pinkyVal); 
+		int inclinationPercentage = (indexVal + middleVal + ringVal + pinkyVal); 
+		if(xGloveController.DEBUG) System.out.println(TAG + " getInclinationPercentage(): " + inclinationPercentage); 
+	    return inclinationPercentage; 
 	}
 
     public int getFlexValue(Finger finger) 

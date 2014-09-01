@@ -3,6 +3,9 @@ import processing.serial.*;
 	
 public class xGloveController extends PApplet
 {
+	//Used in debug logs
+	private final String TAG = "xGloveController";
+	
 	//Used for tracking versions of this class. Eclipse complains about not declaring this for some reason.
 	private static final long serialVersionUID = 1L;
 	
@@ -57,7 +60,7 @@ public class xGloveController extends PApplet
 	  String message = myPort.readStringUntil(LF); // read serial data
 	  if(message != null)
 	  {
-	    if(DEBUG) println("Raw: " + message);
+	    if(DEBUG) println(TAG + "Raw: " + message);
 	    String[] data  = message.split(","); // Split the comma-separated message
 
 	    try 
@@ -81,7 +84,7 @@ public class xGloveController extends PApplet
 	      } 
 	      else if(!"v1".equals(data[0])) 
 	      {
-	        throw new Exception("Data header was not recognized");
+	        throw new Exception(TAG + "Data header was not recognized");
 	      }
 	      float orientationRoll = Float.parseFloat(data[1].trim());  
 	      float orientationPitch = Float.parseFloat(data[2].trim());
@@ -97,8 +100,8 @@ public class xGloveController extends PApplet
 	      
 	      if(DEBUG) 
 	      {
-	        println("Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
-	        println("FLex sensors: " + index + ", " + middle + ", " + ring + ", " + pinky);
+	        println(TAG + " serialEvent() : Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
+	        println(TAG + " serialEvent() : Flex sensors: " + index + ", " + middle + ", " + ring + ", " + pinky);
 	      }
 	    }
 	    catch (Throwable t) 
