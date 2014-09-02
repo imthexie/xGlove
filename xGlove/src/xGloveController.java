@@ -25,10 +25,13 @@ public class xGloveController extends PApplet
 	public static boolean DEBUG = true;
 	
 	//Is connected to the right port
-	private boolean isConnected;
+	private volatile boolean isConnected;
 	
 	//Latest time data sent
 	private long timeOfLatestData;
+	
+	//Thread to check for timeout
+	PortTimeoutThread portTimeoutThread;
 
 	public void setup() 
 	{
@@ -51,30 +54,21 @@ public class xGloveController extends PApplet
 		 	{
 		 		portIndex++;
 		 		//Wait and try again
-		 		delay(100);
+		 		delay(500);
 		 	}
 		}
+		
+		portTimeoutThread = new PortTimeoutThread(1000);
+		portTimeoutThread.start();
 	}
 
-	public void draw() 
-	{
-		delay(1000);
-		if(!isConnected) 
-		{
-			portIndex++;
-			setup();
-		}
-		
-		//If 2000 milliseconds have passed since last data has been sent, reset in same port.
-		if(System.currentTimeMillis() - timeOfLatestData > 2000) {
-			setup();
-		}
-	}
+	public void draw() {}
 	
 	public void keyPressed() 
 	{
 		if(key == ESC) 
 		{
+			portTimeoutThread.quit();
 			exit();
 		}
 	}
@@ -139,5 +133,54 @@ public class xGloveController extends PApplet
 	      println(t.getMessage()); //Print error message
 	    }      
 	  }
+	}
+	
+	class PortTimeoutThread extends Thread {	
+		volatile boolean running;           // Is the thread running?  Yes or no?
+		int wait;                  // How many milliseconds should we wait in between executions?
+		// Constructor, create the thread
+		PortTimeoutThread(int waitTime) {
+			wait = waitTime;
+			running = false;
+		}
+		// Overriding "start()"
+		public void start() {
+		// Set running equal to true
+			running = true;
+		    super.start();
+		}
+	 
+		public void run() 
+		{
+			while (running) 
+			{
+				try 
+				{
+					Thread.sleep(wait);
+				} 
+				catch(InterruptedException e) {}
+				
+				if(!isConnected) 
+				{
+					portIndex++;
+					setup();
+				}
+				
+				//If 2000 milliseconds have passed since last data has been sent, reset in same port.
+				if(System.currentTimeMillis() - timeOfLatestData > 2000) 
+				{
+					setup();
+				}
+			}
+		}
+			 
+			 
+			  //Quits the thread
+		public void quit() 
+		{
+			System.out.println("Quitting."); 
+			running = false;  // Setting running to false ends the loop in run()
+			interrupt();
+		}
 	}
 }

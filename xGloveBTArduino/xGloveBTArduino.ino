@@ -93,11 +93,9 @@ void sendResetInfo() {
   if(Serial1.read() == 'R') 
   { 
     needReset = false;
-    Serial1.clear();
   } 
   else 
   {
-    Serial1.clear();
     readLocationSensors(true);
     // Tell the computer/connected device that we are recalibrating
     Serial1.println(RESET + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
