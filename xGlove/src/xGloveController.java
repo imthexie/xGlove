@@ -17,35 +17,59 @@ public class xGloveController extends PApplet
 	Serial myPort;   // Create object from Serial class
 	                             
 	public static final short LF = 10;        // ASCII linefeed
-	public static final short portIndex = 0;  // select the com port, 
+	public static int portIndex = 0;  // select the com port, 
 	                                          // 0 is the first port
 	xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
 	public static boolean DEBUG = true;
+	
+	//Is connected to the right port
+	private boolean isConnected;
+	
+	//Latest time data sent
+	private long timeOfLatestData;
 
 	public void setup() 
 	{
-	  println(Serial.list());
-	  println(" Connecting to -> " + Serial.list()[portIndex]);
-	  
-	  while(true) 
-	  {
-		try 
+		isConnected = false;
+		dispatcher = new xGloveDispatcher(); 
+
+		//Keep trying to connect to a port
+		while(true) 
 		{
-			myPort = new Serial(this,Serial.list()[portIndex], 115200);
-			break;
-	 	} 
-	 	catch(Exception e) 
-	 	{
-	 		//Wait and try again
-	 		delay(1000);
-	 	}
-	  }
-	  dispatcher = new xGloveDispatcher(); 
+			int numPorts = Serial.list().length;
+			if(portIndex >= numPorts) portIndex = 0;
+			println(Serial.list());
+			println(" Connecting to -> " + Serial.list()[portIndex]);
+			try 
+			{
+				myPort = new Serial(this, Serial.list()[portIndex], 115200);
+				break;
+		 	} 
+		 	catch(Exception e) 
+		 	{
+		 		portIndex++;
+		 		//Wait and try again
+		 		delay(100);
+		 	}
+		}
 	}
 
-	public void draw() {}
+	public void draw() 
+	{
+		delay(1000);
+		if(!isConnected) 
+		{
+			portIndex++;
+			setup();
+		}
+		
+		//If 2000 milliseconds have passed since last data has been sent, reset in same port.
+		if(System.currentTimeMillis() - timeOfLatestData > 2000) {
+			setup();
+		}
+	}
 	
 	public void keyPressed() 
 	{
@@ -79,13 +103,18 @@ public class xGloveController extends PApplet
 	    	  maxima[1] = Integer.parseInt(data[7].trim());
 	    	  
 	    	  dispatcher.reset(orientationRoll, orientationPitch, orientationHeading, 
-	    			  			minima, maxima);	
+	    			  			minima, maxima);
+	    	  myPort.clear();
+	    	  myPort.write('R');
+	    	  isConnected = true;
+	    	  timeOfLatestData = System.currentTimeMillis();
 	    	  return;
 	      } 
 	      else if(!"v1".equals(data[0])) 
 	      {
 	        throw new Exception(TAG + "Data header was not recognized");
 	      }
+	      
 	      float orientationRoll = Float.parseFloat(data[1].trim());  
 	      float orientationPitch = Float.parseFloat(data[2].trim());
 	      float orientationHeading = Float.parseFloat(data[3].trim());
@@ -97,7 +126,7 @@ public class xGloveController extends PApplet
 	      int pinky = Integer.parseInt(data[8].trim());
 	            
 	      dispatcher.updateSensorValues(orientationRoll, orientationPitch, orientationHeading, thumb, index, middle, ring, pinky);
-	      
+    	  timeOfLatestData = System.currentTimeMillis();
 	      if(DEBUG) 
 	      {
 	        println(TAG + " serialEvent() : Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);

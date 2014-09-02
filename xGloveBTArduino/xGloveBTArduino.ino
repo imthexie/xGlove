@@ -42,12 +42,14 @@ int maxima[]                                =   {0,  40};          // actual ana
 
 //Version tag
 const String VERSION_TAG = "v1";
+cosnt String RESET = "RESET";
 
+//Has been reset or not
+boolean needReset;
 
 void setup() 
 {
     Serial1.begin(115200);
-    
     /* Initialise the sensors */ 
     initSensors(); 
     
@@ -62,29 +64,62 @@ void setup()
          minima[0] = orientation.heading - 50;
          maxima[0] = orientation.heading + 50;
     }
-    
-    // Tell the computer/connected device that we are recalibrating
-    Serial1.println("RESET" + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
-                     minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);    
+    needReset = true;
+    //Wait until serial port is open
+    while(!Serial1);
+     Serial1.println(RESET + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+                     minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
 }                
 
  
 void loop() 
 { 
-    readLocationSensors();
-    readFlexSensors();
-    Serial1.println(VERSION_TAG + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
-                    thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
-                    ringFingerCurrentValue + ',' + pinkyCurrentValue);
+    if(needReset) 
+    {
+      sendResetInfo();
+    } 
+    else 
+    {
+      readLocationSensors(false);
+      readFlexSensors();
+      Serial1.println(VERSION_TAG + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+                      thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
+                      ringFingerCurrentValue + ',' + pinkyCurrentValue);
+    }
     delay(1);
 } 
 
-void readLocationSensors() 
+void sendResetInfo() {
+  if(Serial1.read() == 'R') 
+  { 
+    needReset = false;
+    Serial1.clear();
+  } 
+  else 
+  {
+    Serial1.clear();
+    readLocationSensors(true);
+    // Tell the computer/connected device that we are recalibrating
+    Serial1.println(RESET + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+                    minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
+  }
+}
+
+
+
+void readLocationSensors(boolean setMaxima) 
 {
   /* Read the accelerometer and magnetometer */
-    accel.getEvent(&accel_event);
+    accel.getEvent(&accel_event); 
     mag.getEvent(&mag_event);
-    dof.fusionGetOrientation(&accel_event, &mag_event, &orientation);  //merge accel/mag data
+  
+    /* calibrate x-axis minima and maxima based on the current orientation  */
+    /* of the glove                                                         */  
+    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation) && setMaxima)
+    {
+         minima[0] = orientation.heading - 50;
+         maxima[0] = orientation.heading + 50;
+    }
 }
 
 void readFlexSensors() 
