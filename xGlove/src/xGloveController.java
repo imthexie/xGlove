@@ -54,11 +54,11 @@ public class xGloveController extends PApplet
 		 	{
 		 		portIndex++;
 		 		//Wait and try again
-		 		delay(500);
+		 		delay(100);
 		 	}
 		}
 		
-		portTimeoutThread = new PortTimeoutThread(1000);
+		portTimeoutThread = new PortTimeoutThread(2000);
 		portTimeoutThread.start();
 	}
 

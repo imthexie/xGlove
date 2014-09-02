@@ -42,7 +42,7 @@ int maxima[]                                =   {0,  40};          // actual ana
 
 //Version tag
 const String VERSION_TAG = "v1";
-cosnt String RESET = "RESET";
+const String RESET = "RESET";
 
 //Has been reset or not
 boolean needReset;
@@ -65,15 +65,16 @@ void setup()
          maxima[0] = orientation.heading + 50;
     }
     needReset = true;
-    //Wait until serial port is open
-    while(!Serial1);
-     Serial1.println(RESET + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
-                     minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
 }                
 
  
 void loop() 
 { 
+    if(!Serial1) 
+    {
+      needReset = true;
+      while(!Serial1);
+    }
     if(needReset) 
     {
       sendResetInfo();
