@@ -37,8 +37,8 @@ class xGloveSensor
 		this.middleVal = middleVal;
 		this.ringVal = ringVal;
 		this.pinkyVal = pinkyVal;
-		if(xGloveController.DEBUG) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
-				+ " Index: " + this.indexVal + " Middle: " + this.middleVal + " Ring: " + this.ringVal + " Pinky: " + this.pinkyVal);
+		//if(xGloveController.DEBUG) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
+		//		+ " Index: " + this.indexVal + " Middle: " + this.middleVal + " Ring: " + this.ringVal + " Pinky: " + this.pinkyVal);
 	}
 
 	public void updateOrientation(float roll, float pitch, float heading) 
@@ -47,8 +47,8 @@ class xGloveSensor
 	    orientation.pitch = pitch;
 	    orientation.heading = heading;
 	    
-	    if(xGloveController.DEBUG) System.out.println(TAG + " updateOrientation(): " + "Roll: " + orientation.roll 
-	    											+ " Pitch: " + orientation.pitch + " Heading: " + orientation.heading);
+	    //if(xGloveController.DEBUG) System.out.println(TAG + " updateOrientation(): " + "Roll: " + orientation.roll 
+	    //											+ " Pitch: " + orientation.pitch + " Heading: " + orientation.heading);
   	}
 
 	public boolean isFingerBent(Finger finger, double percentageBent) 

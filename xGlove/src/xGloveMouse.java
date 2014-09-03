@@ -111,9 +111,21 @@ class xGloveMouse
 	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
 	  int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
 	  
-	  if(xGloveController.DEBUG) System.out.println(TAG + ": moveMouse() : xReading: " + xReading + " yReading " + yReading);
+	  if(xGloveController.DEBUG)
+	  {
+		  System.out.println("Result ->     xReading: " + xReading + "\t      yReading " + yReading);
+		  System.out.println();
+		  System.out.println();
+	  }
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
+	  
+	  try {
+		    Thread.sleep(1000);                 //1000 milliseconds is one second.
+	  } catch(InterruptedException ex) 
+	  {
+		    Thread.currentThread().interrupt();
+      }
   }
 
     /* Function: get_cursor_position
@@ -125,7 +137,8 @@ class xGloveMouse
   private int getCursorPosition(float heading, int axisNumber) 
   {
       int distance = 0;    // distance from center of the output range
-      if(xGloveController.DEBUG) System.out.println(TAG + ": getCursorPosition() : " + "Input heading: " + heading + " Axis: " + axisNumber);
+      if(xGloveController.DEBUG && axisNumber == 0) System.out.print("x - axis ->  " + " Input heading: " + heading);
+      if(xGloveController.DEBUG && axisNumber == 1) System.out.print("y - axis ->  " + " Input heading:   " + heading);
 
       // map the reading from the analog input range to the output range:
       heading = map((int)heading, minima[axisNumber], maxima[axisNumber], 0, range);
@@ -133,15 +146,24 @@ class xGloveMouse
       // if the output reading is outside from the
       // rest position threshold,  use it:
       if (Math.abs(heading - center) > threshold) distance = ((int)heading - center);
-
+      
       // the reading needs to be inverted in order to 
       // map the movement correctly:
       distance = -distance;
       
-      if(xGloveController.DEBUG) System.out.println(TAG + ": getCursorPosition() : " + "Returned distance result: " + distance + " Mapped heading: " + heading + 
-				" \nMinima[axisNumber] " + minima[axisNumber] + " Maxima[axisNumber] " + maxima[axisNumber] + "Range: " + range);
-      
-
+      if(xGloveController.DEBUG)
+      {
+    	  if(axisNumber == 0)
+    	  {
+    		  System.out.println("   Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
+			  			 		 minima[axisNumber] + "\t              Maxima " + maxima[axisNumber]);
+    	  }
+    	  else if(axisNumber == 1)
+    	  {
+    		  System.out.println("  Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
+    				  			 minima[axisNumber] + "\t      Maxima " + maxima[axisNumber]);
+    	  }
+      }
       // return the distance for this axis:
       return distance;
   }

@@ -21,11 +21,11 @@ static sensors_event_t mag_event;
 static sensors_vec_t   orientation;
 
  /* Analog Input Pins corresponding to each finger */
-static const int thumbPin                   =   A5;
-static const int indexFingerPin             =   A4; 
-static const int ringFingerPin              =   A3;
-static const int middleFingerPin            =   A2;
-static const int pinkyPin                   =   A1;
+static const int thumbPin                   =   A1;
+static const int indexFingerPin             =   A2; 
+static const int middleFingerPin            =   A3;
+static const int ringFingerPin              =   A4;
+static const int pinkyPin                   =   A5;
 
 /* These global variables indicate the current analogRead values
  * of each fingers, four fingers and all fingers.
@@ -83,7 +83,7 @@ void loop()
     {
       readLocationSensors(false);
       readFlexSensors();
-      Serial1.println(VERSION_TAG + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+      Serial1.println(VERSION_TAG + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
                       thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
                       ringFingerCurrentValue + ',' + pinkyCurrentValue);
     }
@@ -99,7 +99,7 @@ void sendResetInfo() {
   {
     readLocationSensors(true);
     // Tell the computer/connected device that we are recalibrating
-    Serial1.println(RESET + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
+    Serial1.println(RESET + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
                     minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
   }
 }
