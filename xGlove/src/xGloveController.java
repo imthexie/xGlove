@@ -43,8 +43,8 @@ public class xGloveController extends PApplet
 		{
 			int numPorts = Serial.list().length;
 			if(portIndex >= numPorts) portIndex = 0;
-			//println(Serial.list());
-			//println(" Connecting to -> " + Serial.list()[portIndex]);
+			println(Serial.list());
+			println(" Connecting to -> " + Serial.list()[portIndex]);
 			try 
 			{
 				myPort = new Serial(this, Serial.list()[portIndex], 115200);
@@ -64,7 +64,7 @@ public class xGloveController extends PApplet
 
 	public void draw() 
 	{
-		//println("is Connected: " + isConnected);
+		println("is Connected: " + isConnected);
 	}
 	
 	public void keyPressed() 
@@ -81,7 +81,7 @@ public class xGloveController extends PApplet
 	  String message = myPort.readStringUntil(LF); // read serial data
 	  if(message != null)
 	  {
-	    //if(DEBUG) println(TAG + "Raw: " + message);
+	    if(DEBUG) println(TAG + "Raw: " + message);
 	    String[] data  = message.split(","); // Split the comma-separated message
 
 	    try 
@@ -126,14 +126,14 @@ public class xGloveController extends PApplet
     	  timeOfLatestData = System.currentTimeMillis();
 	      if(DEBUG) 
 	      {
-	        //println(TAG + " serialEvent() : Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
-	        //println(TAG + " serialEvent() : Flex sensors: " + index + ", " + middle + ", " + ring + ", " + pinky);
+	        println(TAG + " serialEvent() : Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
+	        println(TAG + " serialEvent() : Flex sensors: " + index + ", " + middle + ", " + ring + ", " + pinky);
 	      }
 	    }
 	    catch (Throwable t) 
 	    {
-	      //println("Parse Error : " + message); // parse error
-	      //println(t.getMessage()); //Print error message
+	      println("Parse Error : " + message); // parse error
+	      println(t.getMessage()); //Print error message
 	    }      
 	  }
 	}

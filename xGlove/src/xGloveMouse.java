@@ -8,19 +8,20 @@ class xGloveMouse
 {
 	//Used in debug logs
 	private final String TAG = "xGloveMouse";
-	Robot mouseRobot;     // create object from Robot class;
-	private static final int xRate = 5;
+	private boolean debugMouse = false;
+	Robot mouseRobot;                   // create object from Robot class;
+	private static final int xRate = 5; // multiplier to adjust movement rate
 	private static final int yRate = 4; // multiplier to adjust movement rate
 
 	xGloveGesture gesture;
 
 	Dimension screen; //Computer screen data
   
-	int range = 12;               // output range of X or Y movement
-	int threshold = range / 18;         // resting threshold  originally -> /10
-	int center = range / 2;          // resting position value
-	int minima[] = {0, -40};         // actual analogRead minima for {x, y}
-	int maxima[] = {0, 40};          // actual analogRead maxima for {x, y}
+	int range       =  12;               // output range of X or Y movement
+	int threshold   =  range / 18;       // resting threshold  originally -> /10
+	int center      =  range / 2 ;        // resting position value
+	int minima[]    =  {0,  -40 };         // actual analogRead minima for {x, y}
+	int maxima[]    =  {0,   40 };          // actual analogRead maxima for {x, y}
 
 	//TODO: Test this, and evaluate need to use AtomicInteger
 	int x, y; //coordinates of mouse
@@ -51,15 +52,47 @@ class xGloveMouse
 
 		this.gesture = new xGloveGesture();
 	}
-
+    
 	// method to move mouse from current position by given offset
 	private void move(int offsetX, int offsetY) 
 	{
-		x += (xRate * offsetX);
-		y += (yRate * offsetY);
+		if(debugMouse)
+		{
+			System.out.print("Current Location x = " + x);
+			System.out.println("\t\t      Current Location y = " + y);
+		}
+		
+		if((x + (xRate * offsetX)) > screen.getWidth())
+		{
+			x = (int)screen.getWidth();
+		}
+		else if((x + (xRate * offsetX)) < 0)
+		{
+			x = 0;
+		}
+		else x += (xRate * offsetX);
+		
+		if((y + (yRate * offsetY)) > screen.getHeight())
+		{
+			y = (int)screen.getHeight();
+		}
+		else if((y + (yRate * offsetY)) < 0)
+		{
+			y = 0;
+		}
+		else y += (yRate * offsetY);
+		
+		if(debugMouse)
+		{
+			System.out.print("New Location x = " + x);
+			System.out.println("\t\t      New Location y = " + y);
+			System.out.println();
+			System.out.println();
+		}
+		
 		mouseRobot.mouseMove(x, y); //mouseMove moves to a given position
 	}
-  
+    
 	//Move mouse to a specified location
 	private void moveTo(int posX, int posY) 
 	{
@@ -67,10 +100,11 @@ class xGloveMouse
 		y = posY;
 		mouseRobot.mouseMove(posX, posY);
 	}
- 
+    
 	public void centerMouse() 
 	{
-		moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2);
+		//mouseMove moves to a given position
+		moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2); 
 	}
 
     /* Function: mouse_left_click
@@ -111,12 +145,13 @@ class xGloveMouse
 	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
 	  int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
 	  
-	  if(xGloveController.DEBUG)
+	  
+	  if(debugMouse)
 	  {
-		  System.out.println("Result ->     xReading: " + xReading + "\t      yReading " + yReading);
-		  System.out.println();
-		  System.out.println();
+		  System.out.println("Result   ->   xReading: " + xReading + "\t        yReading " + yReading);
 	  }
+	  
+	  
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
 	  
@@ -145,13 +180,13 @@ class xGloveMouse
       
       // if the output reading is outside from the
       // rest position threshold,  use it:
-      if (Math.abs(heading - center) > threshold) distance = ((int)heading - center);
+      if (Math.abs(heading - center) > threshold) distance = (center - (int)heading);
       
       // the reading needs to be inverted in order to 
       // map the movement correctly:
-      //distance = -distance;
-      
-      if(xGloveController.DEBUG)
+
+
+      if(debugMouse)
       {
     	  if(axisNumber == 0)
     	  {

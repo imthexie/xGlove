@@ -61,7 +61,7 @@ class xGloveDispatcher {
     public void updateSensorValues(float orientationRoll, float orientationPitch, float orientationHeading, 
                                     int thumbVal, int indexVal, int middleVal, int ringVal, int pinkyVal) 
     {
-    	//if(xGloveController.DEBUG) System.out.println("Updating Sensors");
+    	if(xGloveController.DEBUG) System.out.println("Updating Sensors");
 
         sensor.updateOrientation(orientationRoll, orientationPitch, orientationHeading);
         sensor.updateFlexValues(thumbVal, indexVal, middleVal, ringVal, pinkyVal);
@@ -71,7 +71,7 @@ class xGloveDispatcher {
     public void dispatchEvents() 
     {
     	
-    	//if(xGloveController.DEBUG) System.out.println("Dispatching Events");
+    	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
         //Always try to move the mouse for now
         mouseThread.execute(mouseMoveEvent);
