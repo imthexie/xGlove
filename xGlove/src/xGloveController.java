@@ -178,10 +178,10 @@ public class xGloveController extends PApplet
 		}
 			 
 			 
-			  //Quits the thread
+		//Exits the thread
 		public void quit() 
 		{
-			System.out.println("Quitting."); 
+			System.out.println("Exit - The program has been terminated."); 
 			running = false;  // Setting running to false ends the loop in run()
 			interrupt();
 		}

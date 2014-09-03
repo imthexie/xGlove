@@ -120,12 +120,12 @@ class xGloveMouse
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
 	  
-	  try {
+	  /*try {
 		    Thread.sleep(1000);                 //1000 milliseconds is one second.
 	  } catch(InterruptedException ex) 
 	  {
 		    Thread.currentThread().interrupt();
-      }
+      }*/
   }
 
     /* Function: get_cursor_position
@@ -149,7 +149,7 @@ class xGloveMouse
       
       // the reading needs to be inverted in order to 
       // map the movement correctly:
-      distance = -distance;
+      //distance = -distance;
       
       if(xGloveController.DEBUG)
       {
@@ -160,7 +160,7 @@ class xGloveMouse
     	  }
     	  else if(axisNumber == 1)
     	  {
-    		  System.out.println("  Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
+    		  System.out.println("   Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
     				  			 minima[axisNumber] + "\t      Maxima " + maxima[axisNumber]);
     	  }
       }
