@@ -67,19 +67,13 @@ void setup()
     pinMode(13, OUTPUT); //Pin indicates reset
     while(!Serial1);
     needReset = true;
+    digitalWrite(13, HIGH);
 }                
 
  
 void loop() 
 { 
-    Serial1.flush();
-    //check for need to reset
-    if(Serial1.peek() == 'N') {
-        needReset = true;
-        Serial1.read();
-        digitalWrite(13, HIGH);
-    }
-    
+    readIncomingData();
     if(needReset) 
     {
       sendResetInfo();
@@ -95,21 +89,36 @@ void loop()
     delay(1);
 } 
 
-void sendResetInfo() {
+void readIncomingData() 
+{
   Serial1.flush();
-  if(Serial1.peek() == 'Y') 
-  { 
-    digitalWrite(13, LOW); 
-    needReset = false;
-    Serial1.read();
-  } 
-  else 
+  while(Serial1.available() > 0) 
   {
+      if(Serial1.peek() == 'Y') 
+      {
+          digitalWrite(13, LOW);
+          needReset = false;
+          Serial1.read();
+      }
+      else if(Serial1.peek() == 'N') 
+      {
+          needReset = true;
+          Serial1.read();
+          digitalWrite(13, HIGH);
+      }
+      else 
+      {
+            //discard bad received data
+            Serial1.read();
+      }
+  }
+}
+
+void sendResetInfo() {
     readLocationSensors(true);
     // Tell the computer/connected device that we are recalibrating
     Serial1.println(RESET + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
                     minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
-  }
 }
 
 
