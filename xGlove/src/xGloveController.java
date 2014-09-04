@@ -1,7 +1,12 @@
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Scanner;
+
 import processing.core.*;
 import processing.serial.*;
+
 	
-public class xGloveController extends PApplet
+public class xGloveController extends PApplet implements KeyListener
 {
 	//Used in debug logs
 	private final String TAG = "xGloveController";
@@ -14,7 +19,7 @@ public class xGloveController extends PApplet
 	    PApplet.main(new String[] {"xGloveController" });
 	}
 	
-	Serial myPort;   // Create object from Serial class
+	Serial myPort = null;   // Create object from Serial class
 	                             
 	public static final short LF = 10;        // ASCII linefeed
 	public static int portIndex = 0;  // select the com port, 
@@ -32,47 +37,85 @@ public class xGloveController extends PApplet
 	
 	//Thread to check for timeout
 	PortTimeoutThread portTimeoutThread;
-
+	
 	public void setup() 
-	{
+	{	
+		String[] serialPorts = Serial.list();
+		//Close port when shutting down 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    @Override
+		    public void run() {
+				System.out.println("Clean up Resources."); 
+		    	if(myPort != null) {
+		    		myPort.clear();
+		    		myPort.write('N'); //Reset bluetooth to send resets
+					myPort.stop(); 	
+		    	}
+		    	if(portTimeoutThread != null) portTimeoutThread.quit();
+		    }
+
+		});
+		
+		//Query user for COM port. This will be set using a UI setup process later using name of port.
+		println(serialPorts);
+		Scanner reader = new Scanner(System.in);
+		System.out.print("Enter the index of the COM port : ");
+		portIndex = reader.nextInt();
+		reader.close();
+		
 		isConnected = false;
 		dispatcher = new xGloveDispatcher(); 
-
+		
+		portTimeoutThread = new PortTimeoutThread(2000);
+		portTimeoutThread.start();
+	}
+	
+	public void connectToPort() {
 		//Keep trying to connect to a port
-		while(true) 
+		for(int i = 0; i < 150; i++) 
 		{
-			int numPorts = Serial.list().length;
-			if(portIndex >= numPorts) portIndex = 0;
-			println(Serial.list());
-			println(" Connecting to -> " + Serial.list()[portIndex]);
+			String[] serialPorts = Serial.list();
+			println(serialPorts);
+			println(" Connecting to -> " + serialPorts[portIndex]);
 			try 
 			{
+				//Close port if opened before
+				if(myPort != null) 
+				{
+					myPort.clear();
+					myPort.stop(); 	
+					myPort.dispose();
+				}
 				myPort = new Serial(this, Serial.list()[portIndex], 115200);
+				myPort.clear();
+				myPort.write('N'); // request reset
 				break;
 		 	} 
 		 	catch(Exception e) 
 		 	{
-		 		portIndex++;
+		 		myPort = null;
+		 		if(i == 149) {
+		 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");
+		 			System.exit(1);
+		 		}
 		 		//Wait and try again
 		 		delay(100);
 		 	}
 		}
-		
-		portTimeoutThread = new PortTimeoutThread(2000);
-		portTimeoutThread.start();
 	}
 
 	public void draw() 
 	{
 		println("is Connected: " + isConnected);
-	}
-	
-	public void keyPressed() 
-	{
-		if(key == ESC) 
+		if(!isConnected) 
 		{
-			portTimeoutThread.quit();
-			exit();
+			try 
+			{
+				if(myPort != null) myPort.write('N'); //request reset
+			} 
+			catch (Exception e) {
+				myPort = null;
+			}
 		}
 	}
 
@@ -102,14 +145,17 @@ public class xGloveController extends PApplet
 	    	  dispatcher.reset(orientationRoll, orientationPitch, orientationHeading, 
 	    			  			minima, maxima);
 	    	  myPort.clear();
-	    	  myPort.write('R');
+	    	  myPort.write('Y');
 	    	  isConnected = true;
 	    	  timeOfLatestData = System.currentTimeMillis();
 	    	  return;
 	      } 
 	      else if(!"v1".equals(data[0])) 
 	      {
-	        throw new Exception(TAG + "Data header was not recognized");
+	    	  myPort.clear();
+	    	  myPort.write('N'); //request reset
+	    	  timeOfLatestData = System.currentTimeMillis();
+	    	  throw new Exception(TAG + "Data header was not recognized");
 	      }
 	      
 	      float orientationRoll = Float.parseFloat(data[1].trim());  
@@ -156,24 +202,26 @@ public class xGloveController extends PApplet
 		public void run() 
 		{
 			while (running) 
-			{
+			{				
+				if(!isConnected) 
+				{
+					connectToPort();
+				} 
+				else {
+				
+					//If 5000 milliseconds have passed since last data has been sent, reset in same port.
+					long currTime = System.currentTimeMillis();
+					println(TAG + ": PortTimeoutThread : CurrTime: " + currTime + " timeOfLatestData: "+ timeOfLatestData + " diff: " + (currTime - timeOfLatestData));
+					if(currTime - timeOfLatestData > 3000) 
+					{
+						setup();
+					}
+				}
 				try 
 				{
 					Thread.sleep(wait);
 				} 
 				catch(InterruptedException e) {}
-				
-				if(!isConnected) 
-				{
-					portIndex++;
-					setup();
-				}
-				
-				//If 2000 milliseconds have passed since last data has been sent, reset in same port.
-				if(System.currentTimeMillis() - timeOfLatestData > 2000) 
-				{
-					setup();
-				}
 			}
 		}
 			 
@@ -186,4 +234,18 @@ public class xGloveController extends PApplet
 			interrupt();
 		}
 	}
+
+	//Must override these to implement KeyListener
+	@Override
+	public void keyTyped(KeyEvent e) {}
+
+	@Override
+	public void keyPressed(KeyEvent e) 
+	{ 
+		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) System.exit(0); 
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {}
+	
 }
