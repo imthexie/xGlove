@@ -21,10 +21,10 @@ static sensors_event_t mag_event;
 static sensors_vec_t   orientation;
 
  /* Analog Input Pins corresponding to each finger */
-static const int thumbPin                   =   A1;
-static const int indexFingerPin             =   A2; 
-static const int middleFingerPin            =   A3;
-static const int ringFingerPin              =   A4;
+static const int thumbPin                   =   A2;
+static const int indexFingerPin             =   A3; 
+static const int middleFingerPin            =   A4;
+static const int ringFingerPin              =   A1;
 static const int pinkyPin                   =   A5;
 
 /* These global variables indicate the current analogRead values
