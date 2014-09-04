@@ -84,7 +84,7 @@ class xGloveMouse
 		
 		if(debugMouse)
 		{
-			System.out.print("New Location x = " + x);
+			System.out.print(TAG + ": move(): " + "New Location x = " + x);
 			System.out.println("\t\t      New Location y = " + y);
 			System.out.println();
 			System.out.println();
@@ -148,19 +148,12 @@ class xGloveMouse
 	  
 	  if(debugMouse)
 	  {
-		  System.out.println("Result   ->   xReading: " + xReading + "\t        yReading " + yReading);
+		  System.out.println(TAG + ": moveMouse() : " + "Result   ->   xReading: " + xReading + "\t        yReading " + yReading);
 	  }
 	  
 	  
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
-	  
-	  /*try {
-		    Thread.sleep(1000);                 //1000 milliseconds is one second.
-	  } catch(InterruptedException ex) 
-	  {
-		    Thread.currentThread().interrupt();
-      }*/
   }
 
     /* Function: get_cursor_position
@@ -172,8 +165,8 @@ class xGloveMouse
   private int getCursorPosition(float heading, int axisNumber) 
   {
       int distance = 0;    // distance from center of the output range
-      if(xGloveController.DEBUG && axisNumber == 0) System.out.print("x - axis ->  " + " Input heading: " + heading);
-      if(xGloveController.DEBUG && axisNumber == 1) System.out.print("y - axis ->  " + " Input heading:   " + heading);
+      if(xGloveController.DEBUG && axisNumber == 0) System.out.println(TAG + ": getCursorPostion(): " + "x - axis ->  " + " Input heading: " + heading);
+      if(xGloveController.DEBUG && axisNumber == 1) System.out.println(TAG + ": getCursorPostion(): " + "y - axis ->  " + " Input heading:   " + heading);
 
       // map the reading from the analog input range to the output range:
       heading = map((int)heading, minima[axisNumber], maxima[axisNumber], 0, range);
@@ -190,12 +183,12 @@ class xGloveMouse
       {
     	  if(axisNumber == 0)
     	  {
-    		  System.out.println("   Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
+    		  System.out.println(TAG + ": getCursorPostion(): " + "   Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
 			  			 		 minima[axisNumber] + "\t              Maxima " + maxima[axisNumber]);
     	  }
     	  else if(axisNumber == 1)
     	  {
-    		  System.out.println("   Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
+    		  System.out.println(TAG + ": getCursorPostion(): " + "   Mapped heading: " + heading + "  Distance: " + distance  + "\n\t      Minima " + 
     				  			 minima[axisNumber] + "\t      Maxima " + maxima[axisNumber]);
     	  }
       }

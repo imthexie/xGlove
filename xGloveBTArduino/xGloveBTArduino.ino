@@ -64,23 +64,28 @@ void setup()
          minima[0] = orientation.heading - 50;
          maxima[0] = orientation.heading + 50;
     }
+    pinMode(13, OUTPUT); //Pin indicates reset
+    while(!Serial1);
     needReset = true;
 }                
 
  
 void loop() 
 { 
-    if(!Serial1) 
-    {
-      needReset = true;
-      while(!Serial1);
+    Serial1.flush();
+    //check for need to reset
+    if(Serial1.peek() == 'N') {
+        needReset = true;
+        Serial1.read();
+        digitalWrite(13, HIGH);
     }
+    
     if(needReset) 
     {
       sendResetInfo();
     } 
     else 
-    {
+    {      
       readLocationSensors(false);
       readFlexSensors();
       Serial1.println(VERSION_TAG + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
@@ -91,9 +96,12 @@ void loop()
 } 
 
 void sendResetInfo() {
-  if(Serial1.read() == 'R') 
+  Serial1.flush();
+  if(Serial1.peek() == 'Y') 
   { 
+    digitalWrite(13, LOW); 
     needReset = false;
+    Serial1.read();
   } 
   else 
   {
