@@ -1,125 +1,94 @@
-/* xGloveBTArduino
- * ---------------
- * Description: ...
- *
- */
-
-/* Included Libraries */
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303_U.h>
 #include <Adafruit_9DOF.h>
 
 /* Assign a unique ID to the sensors */
-static Adafruit_9DOF                 dof    =   Adafruit_9DOF();
-static Adafruit_LSM303_Accel_Unified accel  =   Adafruit_LSM303_Accel_Unified(30301);
-static Adafruit_LSM303_Mag_Unified   mag    =   Adafruit_LSM303_Mag_Unified(30302);
-
-/* Global Variables for Accelerometer, Gyroscope, Magnetometer */ 
-static sensors_event_t accel_event;
-static sensors_event_t mag_event;
-static sensors_vec_t   orientation;
+Adafruit_9DOF                 dof   = Adafruit_9DOF();
+Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
+Adafruit_LSM303_Mag_Unified   mag   = Adafruit_LSM303_Mag_Unified(30302);
 
  /* Analog Input Pins corresponding to each finger */
-static const int thumbPin                   =   A5;
-static const int indexFingerPin             =   A4; 
-static const int ringFingerPin              =   A3;
-static const int middleFingerPin            =   A2;
-static const int pinkyPin                   =   A1;
-
-/* These global variables indicate the current analogRead values
- * of each fingers, four fingers and all fingers.
- */
-static int thumbCurrentValue                =   0;
-static int indexFingerCurrentValue          =   0;
-static int middleFingerCurrentValue         =   0;
-static int ringFingerCurrentValue           =   0;
-static int pinkyCurrentValue                =   0;
-
-//Mouse X, Y calibration values
-int minima[]                                =   {0, -40};          // actual analogRead minima for {x, y}
-int maxima[]                                =   {0,  40};          // actual analogRead maxima for {x, y}
+static const int thumbPin                   =   A1;
+static const int indexFingerPin             =   A2; 
+static const int middleFingerPin            =   A3;
+static const int ringFingerPin              =   A4;
+static const int pinkyPin                   =   A5;
 
 
-void setup() 
-{
-    Serial1.begin(115200);
-    /* Initialise the sensors */ 
-    initSensors(); 
-    
-    /* Read the accelerometer and magnetometer */
-    accel.getEvent(&accel_event); 
-    mag.getEvent(&mag_event);
-  
-    /* calibrate x-axis minima and maxima based on the current orientation  */
-    /* of the glove                                                         */  
-    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
-    {
-         minima[0] = orientation.heading - 50;
-         maxima[0] = orientation.heading + 50;
-    }
-    //Wait until serial port is open
-    while(!Serial1);
-     Serial1.println(RESET + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
-                     minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
-}                
-
- 
-void loop() 
-{ 
-    
-      readLocationSensors(false);
-      readFlexSensors();
-      Serial1.println(VERSION_TAG + ',' + (-(int)orientation.roll-10)  + ',' + (-(int)orientation.pitch - 11) + ',' + -(int)orientation.heading + ',' +
-                      thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
-                      ringFingerCurrentValue + ',' + pinkyCurrentValue);
-    delay(1);
-} 
-
-
-void readLocationSensors(boolean setMaxima) 
-{
-  /* Read the accelerometer and magnetometer */
-    accel.getEvent(&accel_event); 
-    mag.getEvent(&mag_event);
-  
-    /* calibrate x-axis minima and maxima based on the current orientation  */
-    /* of the glove                                                         */  
-    if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation) && setMaxima)
-    {
-         minima[0] = orientation.heading - 50;
-         maxima[0] = orientation.heading + 50;
-    }
-}
-
-void readFlexSensors() 
-{
-    //Update finger flex sensor values
-    thumbCurrentValue           =   analogRead(thumbPin);
-    indexFingerCurrentValue     =   analogRead(indexFingerPin);
-    middleFingerCurrentValue    =   analogRead(middleFingerPin);
-    ringFingerCurrentValue      =   analogRead(ringFingerPin);
-    pinkyCurrentValue           =   analogRead(pinkyPin);
-}
-
-/* Function: initSensors
- * ---------------------
- * This function initializes the accelerometer, magnetometer,
- * and gyroscope. See https://github.com/adafruit/Adafruit_Sensor 
- * and https://github.com/adafruit/Adafruit_9DOF for more information. 
- */
 void initSensors()
 {
-    if(!accel.begin())
-    {
-        /* There was a problem detecting the LSM303 ... check your connections */
-        Serial1.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
-        while(1);
-    }
-    if(!mag.begin())
-    {
-        /* There was a problem detecting the LSM303 ... check your connections */
-        Serial1.println("Ooops, no LSM303 detected ... Check your wiring!");
-        while(1);
-    } 
+  if(!accel.begin())
+  {
+    /* There was a problem detecting the LSM303 ... check your connections */
+    Serial1.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
+    while(1);
+  }
+  if(!mag.begin())
+  {
+    /* There was a problem detecting the LSM303 ... check your connections */
+    Serial1.println("Ooops, no LSM303 detected ... Check your wiring!");
+    while(1);
+  }
+}
+
+void setup(void)
+{
+  Serial1.begin(115200);
+  Serial1.println(F("Calibrating xGlove...")); 
+  Serial1.println();
+  Serial1.println();
+  
+  /* Initialise the sensors */
+  initSensors();
+}
+
+/**************************************************************************/
+/*!
+    @brief  Constantly check the roll/pitch/heading/altitude/temperature
+*/
+/**************************************************************************/
+void loop(void)
+{
+  sensors_event_t accel_event;
+  sensors_event_t mag_event;
+  sensors_vec_t   orientation;
+
+  /* Read the accelerometer and magnetometer */
+  accel.getEvent(&accel_event);
+  mag.getEvent(&mag_event);
+
+  /* Use the new fusionGetOrientation function to merge accel/mag data */  
+  if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
+  {
+    /* 'orientation' should have valid .roll and .pitch fields */
+    Serial1.println(F("Orientation "));
+    Serial1.println("roll    pitch    heading");
+    Serial1.print(orientation.roll);
+    Serial1.print(F("    "));
+    Serial1.print(orientation.pitch);
+    Serial1.print(F("     "));
+    Serial1.print(orientation.heading);
+    Serial1.println(F(" "));
+    Serial1.println();
+    
+    Serial1.println(F("Fingers     ")); 
+    Serial1.println("thumb     index    middle    ring    pinky");
+    Serial1.print(analogRead(thumbPin));
+    Serial1.print(F("       "));
+    Serial1.print(analogRead(indexFingerPin));
+    Serial1.print(F("       "));
+    Serial1.print(analogRead(middleFingerPin));
+    Serial1.print(F("       "));
+    Serial1.print(analogRead(ringFingerPin));
+    Serial1.print(F("       "));
+    Serial1.print(analogRead(pinkyPin));
+    Serial1.println(F(" "));  
+    
+    Serial1.println();
+    Serial1.println();
+    Serial1.println();
+  }
+  
+  delay(500);
 }
