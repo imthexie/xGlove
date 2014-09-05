@@ -230,23 +230,27 @@ class xGloveMouse
     
 	while(!gesture.isScrollModeGesture())
     { 
-	  
-      
 	  int inclinationPercentage = gesture.getInclinationFourFingers();
 	  System.out.println("Scroll Mode: " + inclinationPercentage);  
-	  /*
-      if(inclinationPercentage < 20)         // scroll up
+      if(inclinationPercentage < 38)         // scroll up if fingers bent up
       {
-          mouseRobot.mouseWheel(-1 * ((10 / (inclinationPercentage + 1) + 1))); //Negative value is up. Move wheel 1 or 2 notches depending on inclination percentage
-      }
-      else if(inclinationPercentage > 80)   // scroll down
+    	  
+    	  inclinationPercentage = gesture.getInclinationFourFingers();
+    	  System.out.println("Inclination Percentage: " + inclinationPercentage + "  Scroll rate: " + (int)((38 - inclinationPercentage)/3));  
+    	  mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));			     // scroll up
+    	  mouseRobot.setAutoDelay(40);
+
+      }   
+      else if(inclinationPercentage > 53)   // scroll down if fingers bent down
       { 
-          mouseRobot.mouseWheel(1 * (inclinationPercentage / 90 + 1)); //Move wheel down 1 or 2 notches depending on inclination percentage
+    	  inclinationPercentage = gesture.getInclinationFourFingers();
+    	  System.out.println("Inclination Percentage: " + inclinationPercentage + "  Scroll rate: " + (int)((inclinationPercentage - 52) / 3));
+    	  mouseRobot.mouseWheel((int)((52 - inclinationPercentage) / 3));			     // scroll down
+		  mouseRobot.setAutoDelay(40);
       }
-      */
-             
-      /* delay until user stretches ring finger again */
     }
+	
+	/* delay until user stretches ring finger again */
 	while(!gesture.isReleaseScrollModeGesture()) 
     {
 		  System.out.println("ZZZZZZ");
