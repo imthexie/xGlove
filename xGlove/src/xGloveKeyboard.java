@@ -39,19 +39,29 @@ class xGloveKeyboard
 	 * preferences. Usually the F4 key is used to enter the launchpad, but this did not work
 	 * during initial tests of the glove. (TEST IF F4 WORKS)
 	 */
-
 	public void doMacLaunchpad()
 	{
 	    /* enter Launchpad */
-        keyboardRobot.keyPress(KeyEvent.VK_F4); 
-        keyboardRobot.keyRelease(KeyEvent.VK_F4);     
-
+		keyboardRobot.keyPress(KeyEvent.VK_SHIFT); 
+		keyboardRobot.keyPress(KeyEvent.VK_META);   
+		keyboardRobot.keyPress(KeyEvent.VK_L);
+		
+		keyboardRobot.keyRelease(KeyEvent.VK_SHIFT);
+		keyboardRobot.keyRelease(KeyEvent.VK_META);
+		keyboardRobot.keyRelease(KeyEvent.VK_L);
+        
         /* Thread.sleep until glove is back in original position  */
         while(!gesture.rightSideUp()) 
         {    
             xGloveDispatcher.threadSleep(50);
         }   
 	} 
+	
+	public void test()
+	{
+		System.out.println("test");
+		xGloveDispatcher.threadSleep(500);
+	}
 
 	/* Function: load_next_previous
 	 * --------------------

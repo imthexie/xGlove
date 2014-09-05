@@ -31,13 +31,14 @@ class xGloveGesture
     }
 
 
-    //TODO: implement this with a Timer instead. Or just make this event a non-delayed event
+    //Consider implementing this with a Timer instead. Or just make this event a non-delayed event
     public boolean upsideDown()
     {
-        if(Math.abs(sensor.getOrientation().roll) > 170)
+        //System.out.println("test upside down");
+    	if(Math.abs(sensor.getOrientation().roll) > 170)
         {
             /* This for loop is used to ensure that the glove is upside down */
-            /* for at least .5 second (10*delay(50)).                        */
+            /* for at least .5 second -> 10 * 0.05 second                    */
             /* This is to avoid measurement errors.                          */         
             for(int i = 0; i < 10; i+=1)
             {
@@ -51,18 +52,18 @@ class xGloveGesture
         }
         return false;    
     }
+    
+    public boolean rightSideUp()
+    {
+        return Math.abs(sensor.getOrientation().roll) < 50;
+    } 
 
     //TODO: gesture for spacebar
     public boolean isSpacebarGesture() 
     {
         //??
         return false;   
-    }
-
-    public boolean rightSideUp()
-    {
-        return Math.abs(sensor.getOrientation().roll) < 50;
-    }  
+    } 
 
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {

@@ -128,13 +128,13 @@ class xGloveMouse
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		currentlyClicked = true;    // there is a left click
-		System.out.println("There should be a click.");
+		//System.out.println("There should be a click.");
 	}  
 	
 	public void doMouseLeftClickRelease() 
 	{
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		System.out.println("false"); 
+		//System.out.println("false"); 
 		currentlyClicked = false;   // there is no left click 
 		try {
 		    Thread.sleep(250);                

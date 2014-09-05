@@ -73,49 +73,53 @@ class xGloveDispatcher {
     	
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
+    	//keyboard.test();
+    	
         //Always try to move the mouse for now
-        mouseThread.execute(mouseMoveEvent);
+    	//mouseThread.execute(mouseMoveEvent);
 
-	        //Mouse click and release
+	    //Mouse click and release
+	    /*
+      	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
+	    	threadPool.execute(mouseClickEvent); 
+	    }
+	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
+	    	threadPool.execute(mouseClickReleaseEvent);
+	    }
+			    
+	    //Scrolling is a blocking function. No Thread pool
 	        
-        	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
-	            threadPool.execute(mouseClickEvent); 
-	        }
-	        else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
-	            threadPool.execute(mouseClickReleaseEvent);
-	        }
-			
+        if(gesture.isScrollModeGesture()) 
+	    {
+	    	//dispatcherBlocked = true;
+	        mouse.mouseScroll();
+	    }
+	    */
+	    if(gesture.upsideDown()) 
+	    {
+	    	//Mac launchpad is a blocking function
+	    	//dispatcherBlocked = true;
+	        keyboard.doMacLaunchpad();
+	    }
 	        
-	        //Scrolling is a blocking function. No Thread pool
-	        if(gesture.isScrollModeGesture()) 
-	        {
-	        	//dispatcherBlocked = true;
-	            mouse.mouseScroll();
-	        }
-	        
-	        /*
-	        else if(gesture.upsideDown()) 
-	        {
-	            //Mac launchpad is a blocking function
-	        	dispatcherBlocked = true;
-	            keyboard.doMacLaunchpad();
-	        }
-	        else if(gesture.isLoadNextGesture()) 
-	        {
-	            //Load next and previous slide is also blocking
-	        	dispatcherBlocked = true;
-	            keyboard.doLoadNext();
-	        } 
-	        else if (gesture.isLoadPreviousGesture()) 
-	        {
-	        	dispatcherBlocked = true;
-	            keyboard.doLoadPrevious();
-	        }
-	        else {
-	            dispatcherBlocked = false;
-	        }
-	        */
-        }
+	    /*
+	    if(gesture.isLoadNextGesture()) 
+	    {
+	    	//Load next and previous slide is also blocking
+	     	dispatcherBlocked = true;
+	        keyboard.doLoadNext();
+	    } 
+	    if (gesture.isLoadPreviousGesture()) 
+	    {
+	        dispatcherBlocked = true;
+	        keyboard.doLoadPrevious();
+	    }
+	    else  
+	    {
+	        dispatcherBlocked = false;
+	    }
+	    */
+    }
 
     public static xGloveSensor getSensor() 
     { 
