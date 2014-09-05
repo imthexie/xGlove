@@ -74,17 +74,17 @@ class xGloveDispatcher {
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
         //Always try to move the mouse for now
-        //mouseThread.execute(mouseMoveEvent);
+        mouseThread.execute(mouseMoveEvent);
 
 	        //Mouse click and release
-	        /*
+	        
         	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
 	            threadPool.execute(mouseClickEvent); 
 	        }
 	        else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
 	            threadPool.execute(mouseClickReleaseEvent);
 	        }
-			*/
+			
 	        
 	        //Scrolling is a blocking function. No Thread pool
 	        if(gesture.isScrollModeGesture()) 
@@ -92,6 +92,7 @@ class xGloveDispatcher {
 	        	//dispatcherBlocked = true;
 	            mouse.mouseScroll();
 	        }
+	        
 	        /*
 	        else if(gesture.upsideDown()) 
 	        {

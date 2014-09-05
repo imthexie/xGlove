@@ -218,11 +218,9 @@ class xGloveMouse
   
   public void mouseScroll()
   {
-	System.out.println("SUCCESS");
 	/* delay until user stretches ring finger again */
     while(!gesture.isReleaseScrollModeGesture())
     {
-    	System.out.println("Wait");
     	xGloveDispatcher.threadSleep(50);
     }
           
@@ -230,30 +228,25 @@ class xGloveMouse
     
 	while(!gesture.isScrollModeGesture())
     { 
+	  //System.out.println("Scroll");
 	  int inclinationPercentage = gesture.getInclinationFourFingers();
-	  System.out.println("Scroll Mode: " + inclinationPercentage);  
-      if(inclinationPercentage < 38)         // scroll up if fingers bent up
+      if(inclinationPercentage < 38)         								// scroll up if fingers bent up
       {
-    	  
-    	  inclinationPercentage = gesture.getInclinationFourFingers();
-    	  System.out.println("Inclination Percentage: " + inclinationPercentage + "  Scroll rate: " + (int)((38 - inclinationPercentage)/3));  
-    	  mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));			     // scroll up
+    	  inclinationPercentage = gesture.getInclinationFourFingers();  
+    	  mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));	// scroll up
     	  mouseRobot.setAutoDelay(40);
-
       }   
-      else if(inclinationPercentage > 53)   // scroll down if fingers bent down
+      else if(inclinationPercentage > 53)   								// scroll down if fingers bent down
       { 
     	  inclinationPercentage = gesture.getInclinationFourFingers();
-    	  System.out.println("Inclination Percentage: " + inclinationPercentage + "  Scroll rate: " + (int)((inclinationPercentage - 52) / 3));
-    	  mouseRobot.mouseWheel((int)((52 - inclinationPercentage) / 3));			     // scroll down
+    	  mouseRobot.mouseWheel((int)((52 - inclinationPercentage) / 3));	// scroll down
 		  mouseRobot.setAutoDelay(40);
       }
     }
 	
 	/* delay until user stretches ring finger again */
 	while(!gesture.isReleaseScrollModeGesture()) 
-    {
-		  System.out.println("ZZZZZZ");
+	{
 		  xGloveDispatcher.threadSleep(20);
     }     
   }

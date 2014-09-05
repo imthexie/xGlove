@@ -71,16 +71,12 @@ class xGloveGesture
 
     public boolean isMouseReleaseGesture(boolean currentlyClicked) 
     {
-    	System.out.println("Currently clicked: " + currentlyClicked);
+    	//System.out.println("Currently clicked: " + currentlyClicked);
     	return currentlyClicked && sensor.allFingersSpread();
     }
     
     public boolean isScrollModeGesture() 
     {
-    	
-    	//System.out.println("Ring: " + sensor.isFingerBent(Finger.RING, 83));
-    	//System.out.println("Not middle: " + (!(sensor.isFingerBent(Finger.MIDDLE, 53))));
-    	//System.out.println("Not Index: " + (!(sensor.isFingerBent(Finger.INDEX, 53))));
         return sensor.isFingerBent(Finger.RING, 83) && !(sensor.isFingerBent(Finger.MIDDLE, 53)) && !(sensor.isFingerBent(Finger.INDEX, 53));
     }
     
