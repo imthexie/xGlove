@@ -74,15 +74,19 @@ class xGloveGesture
     	System.out.println("Currently clicked: " + currentlyClicked);
     	return currentlyClicked && sensor.allFingersSpread();
     }
-
+    
     public boolean isScrollModeGesture() 
     {
-        return sensor.isFingerBent(Finger.RING, 90) && !(sensor.isFingerBent(Finger.MIDDLE, 50)) && !(sensor.isFingerBent(Finger.INDEX, 50));
+    	
+    	//System.out.println("Ring: " + sensor.isFingerBent(Finger.RING, 83));
+    	//System.out.println("Not middle: " + (!(sensor.isFingerBent(Finger.MIDDLE, 53))));
+    	//System.out.println("Not Index: " + (!(sensor.isFingerBent(Finger.INDEX, 53))));
+        return sensor.isFingerBent(Finger.RING, 83) && !(sensor.isFingerBent(Finger.MIDDLE, 53)) && !(sensor.isFingerBent(Finger.INDEX, 53));
     }
-
+    
     public boolean isReleaseScrollModeGesture() 
     {
-        return sensor.isFingerBent(Finger.RING, 70) && !(sensor.isFingerBent(Finger.MIDDLE, 50));
+    	return !sensor.isFingerBent(Finger.RING, 75) && (sensor.isFingerBent(Finger.MIDDLE, 45));
     }
 
     public boolean isLoadNextGesture() 
@@ -95,8 +99,8 @@ class xGloveGesture
         return sensor.getOrientation().pitch < -70;
     }
 
-    public int getInclinationPercentage() 
+    public int getInclinationPercentage(Finger finger) 
     {
-        return sensor.getInclinationPercentage();
+        return sensor.getInclinationPercentage(finger);
     }
 }

@@ -215,16 +215,24 @@ class xGloveMouse
    * bent up, the page scrolls up. The more the finger are bent the higher the 
    * scrolling speed. The scrolling speed is controlled by the for loop. 
    */
-
+  
   public void mouseScroll()
   {
-	  /* delay until user stretches ring finger again */
-    while(gesture.isReleaseScrollModeGesture()) xGloveDispatcher.threadSleep(50);
+	System.out.println("SUCCESS");
+	/* delay until user stretches ring finger again */
+    while(!gesture.isReleaseScrollModeGesture())
+    {
+    	System.out.println("Wait");
+    	xGloveDispatcher.threadSleep(50);
+    }
           
     /* while loop will exit when ring finger is bent much more than middle finger */
-    while(!gesture.isScrollModeGesture())
-    {
-      int inclinationPercentage = gesture.getInclinationPercentage();
+    
+	while(!gesture.isScrollModeGesture())
+    { 
+	  System.out.println("Scroll Mode");
+      /*
+	  int inclinationPercentage = 5; // gesture.getInclinationPercentage();
             
       if(inclinationPercentage < 20)         // scroll up
       {
@@ -234,13 +242,14 @@ class xGloveMouse
       { 
           mouseRobot.mouseWheel(1 * (inclinationPercentage / 90 + 1)); //Move wheel down 1 or 2 notches depending on inclination percentage
       }
-          
+      */       
       /* delay until user stretches ring finger again */
-      while(!gesture.isReleaseScrollModeGesture()) 
-      {
-    	  xGloveDispatcher.threadSleep(20);
-      }
     }
+	while(!gesture.isReleaseScrollModeGesture()) 
+    {
+		  System.out.println("ZZZZZZ");
+		  xGloveDispatcher.threadSleep(20);
+    }     
   }
   
   public void resetMouse(int[] minima, int[] maxima) 
