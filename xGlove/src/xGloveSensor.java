@@ -132,13 +132,18 @@ class xGloveSensor
 	{
 		switch(finger)
 		{
-			case THUMB   	: return  100 *  (thumbStretch  - thumbVal  )  /  thumbRange  ;
-			case INDEX   	: return  100 *  (indexStretch  - indexVal  )  /  indexRange  ;
-			case MIDDLE  	: return  100 *  (middleStretch - middleVal )  /  middleRange ;
-			case RING    	: return  100 *  (ringStretch   - ringVal   )  /  ringRange   ;
-			case PINKY   	: return  100 *  (pinkyStretch  - pinkyVal  )  /  pinkyRange  ;
+			case THUMB   	: return  (100 *  (thumbStretch  - thumbVal ))  /  thumbRange ;
+			case INDEX   	: return  (100 *  (indexStretch  - indexVal ))  /  indexRange ;
+			case MIDDLE  	: return  (100 *  (middleStretch - middleVal))  /  middleRange;
+			case RING    	: return  (100 *  (ringStretch   - ringVal  ))  /  ringRange  ;
+			case PINKY   	: return  (100 *  (pinkyStretch  - pinkyVal ))  /  pinkyRange ;
 			default 		: return  -1;
 		}
+	}
+	
+	public int getInclinationFourFingers()
+	{
+		return (100 *  (fourFingersStretch  - (indexVal + middleVal + ringVal + pinkyVal)))  /  fourFingersRange  ;
 	}
 	
     public int getFlexValue(Finger finger) 

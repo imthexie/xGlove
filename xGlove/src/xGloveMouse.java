@@ -18,11 +18,11 @@ class xGloveMouse
 
 	Dimension screen; //Computer screen data
   
-	int range       =  12;               // output range of X or Y movement
-	int threshold   =  range / 18;       // resting threshold  originally -> /10
-	int center      =  range / 2 ;        // resting position value
-	int minima[]    =  {0,  -40 };         // actual analogRead minima for {x, y}
-	int maxima[]    =  {0,   40 };          // actual analogRead maxima for {x, y}
+	int range       =  12;              // output range of X or Y movement
+	int threshold   =  range / 18;      // resting threshold  originally -> /10
+	int center      =  range / 2 ;      // resting position value
+	int minima[]    =  {0,  -40 };      // actual analogRead minima for {x, y}
+	int maxima[]    =  {0,   40 };      // actual analogRead maxima for {x, y}
 
 	//TODO: Test this, and evaluate need to use AtomicInteger
 	int x, y; //coordinates of mouse
@@ -230,10 +230,11 @@ class xGloveMouse
     
 	while(!gesture.isScrollModeGesture())
     { 
-	  System.out.println("Scroll Mode");
-      /*
-	  int inclinationPercentage = 5; // gesture.getInclinationPercentage();
-            
+	  
+      
+	  int inclinationPercentage = gesture.getInclinationFourFingers();
+	  System.out.println("Scroll Mode: " + inclinationPercentage);  
+	  /*
       if(inclinationPercentage < 20)         // scroll up
       {
           mouseRobot.mouseWheel(-1 * ((10 / (inclinationPercentage + 1) + 1))); //Negative value is up. Move wheel 1 or 2 notches depending on inclination percentage
@@ -242,7 +243,8 @@ class xGloveMouse
       { 
           mouseRobot.mouseWheel(1 * (inclinationPercentage / 90 + 1)); //Move wheel down 1 or 2 notches depending on inclination percentage
       }
-      */       
+      */
+             
       /* delay until user stretches ring finger again */
     }
 	while(!gesture.isReleaseScrollModeGesture()) 

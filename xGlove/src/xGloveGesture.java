@@ -99,8 +99,8 @@ class xGloveGesture
         return sensor.getOrientation().pitch < -70;
     }
 
-    public int getInclinationPercentage(Finger finger) 
+    public int getInclinationFourFingers() 
     {
-        return sensor.getInclinationPercentage(finger);
+        return sensor.getInclinationFourFingers();
     }
 }
