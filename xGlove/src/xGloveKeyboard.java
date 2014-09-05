@@ -29,6 +29,12 @@ class xGloveKeyboard
 	{
 		keyboardRobot.keyPress(KeyEvent.VK_SPACE);
 		keyboardRobot.keyRelease(KeyEvent.VK_SPACE);
+		
+		while(!gesture.isSpacebarReleaseGesture())
+		{
+			xGloveDispatcher.threadSleep(20);
+			//System.out.println("wait for release spacebar");
+		}
 	}
 
 	/* Function: mac_launchpad
@@ -71,24 +77,27 @@ class xGloveKeyboard
 	 * glove is turned sideways to the right and the fingers are bent the next page is loaded 
 	 * (when browsing), or the next slide is loaded (in MS Powerpoint). 
 	 */
-
 	public void doLoadNext()
 	{
         // right arrow key
         while(gesture.isLoadNextGesture()) // exit when hand is back in original position
         {
-            
             if(gesture.fingersBent()) //finger should be bend
             {
                 keyboardRobot.keyPress(KeyEvent.VK_RIGHT); //right arrow key
-                keyboardRobot.keyRelease(KeyEvent.VK_RIGHT);        
+                keyboardRobot.keyRelease(KeyEvent.VK_RIGHT);  
+                
                 //Web shortcuts not consistent throughout browsers and OS's
-
+                keyboardRobot.keyPress(KeyEvent.VK_META);
+                keyboardRobot.keyPress(KeyEvent.VK_CLOSE_BRACKET);
+                keyboardRobot.keyRelease(KeyEvent.VK_META);
+                keyboardRobot.keyRelease(KeyEvent.VK_CLOSE_BRACKET);
+                
                 xGloveDispatcher.threadSleep(1500);  // Thread.sleep between iterations of this function
              }             
          }        
     }
-
+	
     public void doLoadPrevious() 
     {
         while(gesture.isLoadPreviousGesture()) // exit when hand is back in original position
@@ -99,6 +108,10 @@ class xGloveKeyboard
                 keyboardRobot.keyRelease(KeyEvent.VK_LEFT);
                 
                 //Web shortcuts not consistent throughout browsers and OS's
+                keyboardRobot.keyPress(KeyEvent.VK_META);
+                keyboardRobot.keyPress(KeyEvent.VK_OPEN_BRACKET);
+                keyboardRobot.keyRelease(KeyEvent.VK_META);
+                keyboardRobot.keyRelease(KeyEvent.VK_OPEN_BRACKET);
                     
                 xGloveDispatcher.threadSleep(1500);   // Thread.sleep between iterations of this function
             }             

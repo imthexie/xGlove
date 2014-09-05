@@ -74,12 +74,14 @@ class xGloveDispatcher {
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
     	//keyboard.test();
+    	System.out.println("test");
+    	
     	
         //Always try to move the mouse for now
-    	//mouseThread.execute(mouseMoveEvent);
+    	mouseThread.execute(mouseMoveEvent);
 
 	    //Mouse click and release
-	    /*
+	    
       	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
 	    	threadPool.execute(mouseClickEvent); 
 	    }
@@ -94,8 +96,12 @@ class xGloveDispatcher {
 	    	//dispatcherBlocked = true;
 	        mouse.mouseScroll();
 	    }
-	    */
-	    if(gesture.upsideDown()) 
+        else if(gesture.isSpacebarGesture())
+    	{
+    		//System.out.println("enter spacebar functionality ");
+    		keyboard.doSpacebar();
+    	}
+    	else if(gesture.upsideDown()) 
 	    {
 	    	//Mac launchpad is a blocking function
 	    	//dispatcherBlocked = true;
@@ -109,6 +115,8 @@ class xGloveDispatcher {
 	     	dispatcherBlocked = true;
 	        keyboard.doLoadNext();
 	    } 
+	    */
+	    /*
 	    if (gesture.isLoadPreviousGesture()) 
 	    {
 	        dispatcherBlocked = true;

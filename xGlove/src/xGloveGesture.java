@@ -17,7 +17,7 @@ class xGloveGesture
 
     public boolean fist() 
     {
-        return sensor.allFingersBent(65);
+        return sensor.allFingersBent(72);
     }
 
     public boolean fingersBent() 
@@ -61,9 +61,15 @@ class xGloveGesture
     //TODO: gesture for spacebar
     public boolean isSpacebarGesture() 
     {
-        //??
+        if(fist() && Math.abs(sensor.getOrientation().pitch) < 30) return true;
         return false;   
     } 
+    
+    public boolean isSpacebarReleaseGesture()
+    {
+    	if(!sensor.allFingersBent(55)) return true;
+    	return false;
+    }
 
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {
