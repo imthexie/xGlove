@@ -27,7 +27,7 @@ public class xGloveController extends PApplet implements KeyListener
 	xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	//Is connected to the right port
 	private volatile boolean isConnected;
@@ -75,8 +75,11 @@ public class xGloveController extends PApplet implements KeyListener
 		for(int i = 0; i < 150; i++) 
 		{
 			String[] serialPorts = Serial.list();
-			println(serialPorts);
-			println(" Connecting to -> " + serialPorts[portIndex]);
+			if(DEBUG)
+			{
+				println(serialPorts);
+				println(" Connecting to -> " + serialPorts[portIndex]);
+			}
 			try 
 			{
 				//Close port if opened before
@@ -106,7 +109,10 @@ public class xGloveController extends PApplet implements KeyListener
 
 	public void draw() 
 	{
-		println("is Connected: " + isConnected);
+		if(DEBUG)
+		{
+			println("is Connected: " + isConnected);
+		}
 		if(!isConnected) 
 		{
 			try 
@@ -155,7 +161,10 @@ public class xGloveController extends PApplet implements KeyListener
 	    	  myPort.clear();
 	    	  myPort.write('N'); //request reset
 	    	  timeOfLatestData = System.currentTimeMillis();
+	    	  if(DEBUG)
+	    	  {
 	    	  throw new Exception(TAG + "Data header was not recognized");
+	    	  }
 	      }
 	      
 	      float orientationRoll = Float.parseFloat(data[1].trim());  
@@ -178,8 +187,11 @@ public class xGloveController extends PApplet implements KeyListener
 	    }
 	    catch (Throwable t) 
 	    {
-	      println("Parse Error : " + message); // parse error
-	      println(t.getMessage()); //Print error message
+	      if(DEBUG)
+	      {
+	    	  println("Parse Error : " + message); // parse error
+	    	  println(t.getMessage()); //Print error message
+	      }
 	    }      
 	  }
 	}
@@ -211,7 +223,10 @@ public class xGloveController extends PApplet implements KeyListener
 				
 					//If 5000 milliseconds have passed since last data has been sent, reset in same port.
 					long currTime = System.currentTimeMillis();
-					println(TAG + ": PortTimeoutThread : CurrTime: " + currTime + " timeOfLatestData: "+ timeOfLatestData + " diff: " + (currTime - timeOfLatestData));
+					if(DEBUG)
+					{
+						println(TAG + ": PortTimeoutThread : CurrTime: " + currTime + " timeOfLatestData: "+ timeOfLatestData + " diff: " + (currTime - timeOfLatestData));
+					}
 					if(currTime - timeOfLatestData > 3000) 
 					{
 						setup();

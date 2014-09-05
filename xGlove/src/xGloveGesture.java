@@ -66,11 +66,12 @@ class xGloveGesture
 
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {
-        return (fist() && !currentlyClicked && Math.abs(sensor.getOrientation().pitch) < 35);
+    	return (sensor.allFingersBent(49) && !currentlyClicked && Math.abs(sensor.getOrientation().pitch) < 35);
     }
 
     public boolean isMouseReleaseGesture(boolean currentlyClicked) 
     {
+    	System.out.println("Currently clicked: " + currentlyClicked);
     	return currentlyClicked && sensor.allFingersSpread();
     }
 

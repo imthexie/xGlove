@@ -2,6 +2,7 @@ import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+
 import processing.core.*;
 
 class xGloveMouse 
@@ -116,22 +117,30 @@ class xGloveMouse
    * the glove first has to be returned to the non-click position (currently_clicked
    * then becomes zero). 
    */ 
-
+	
 	public boolean isCurrentlyClicked() 
 	{ 
 		return currentlyClicked; 
 	}
-
+	
 	public void doMouseLeftClick() 
 	{        
-		mouseRobot.mousePress(InputEvent.BUTTON1_DOWN_MASK);  // left click 
+		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
+		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		currentlyClicked = true;    // there is a left click
+		System.out.println("There should be a click.");
 	}  
-
+	
 	public void doMouseLeftClickRelease() 
 	{
-		mouseRobot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release click
+		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
+		System.out.println("false"); 
 		currentlyClicked = false;   // there is no left click 
+		try {
+		    Thread.sleep(250);                
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
 	}
 	
    /* Function: moveMouse
