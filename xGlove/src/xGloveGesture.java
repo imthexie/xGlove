@@ -92,6 +92,25 @@ class xGloveGesture
     	return !sensor.isFingerBent(Finger.RING, 75) && (sensor.isFingerBent(Finger.MIDDLE, 45));
     }
     
+    public boolean isMouseExitGesture()
+    {
+    	if(sensor.getOrientation().roll > 50 && sensor.getOrientation().roll < 90 &&
+    	   Math.abs(sensor.getOrientation().pitch) < 20)
+    	{
+    		for(int i = 0; i < 800; i++)
+    		{
+    			if(sensor.getOrientation().roll < 30 && fist())
+    			{
+    				while(sensor.allFingersBent(65));
+    				return true;
+    			}
+    			else if(Math.abs(sensor.getOrientation().pitch) > 50) break;
+    			xGloveDispatcher.threadSleep(2);    
+    		}
+    	}
+    	return false;
+    }
+    
     public boolean isLoadNextGesture() 
     {
         return sensor.getOrientation().pitch < -50;

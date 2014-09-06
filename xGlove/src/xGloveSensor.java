@@ -109,7 +109,7 @@ class xGloveSensor
 	
 	public boolean allFingersBent(double percentageBent)
 	{
-		boolean test = false;
+		boolean test = true;
 		if(test)
 		{
 			System.out.println("bent value  " + (thumbVal + indexVal + middleVal + ringVal + pinkyVal));

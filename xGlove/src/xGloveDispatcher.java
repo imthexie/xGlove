@@ -15,17 +15,19 @@ class xGloveDispatcher {
 	//Used in debug logs
 	private final String TAG = "xGloveDispatcher";
 	
+	private static boolean moveMouse = true;
+	
     //Finger and sensor values. TODO: Investigate need to use Atomic for concurrency
     public static xGloveSensor sensor;
-    private xGloveMouse mouse;
-    private xGloveKeyboard keyboard;
-    private xGloveGesture gesture;
+    private xGloveMouse        mouse;
+    private xGloveKeyboard     keyboard;
+    private xGloveGesture      gesture;
     
     //Assorted jobs and events for the threads to do
-    private mouseMoveEvent mouseMoveEvent;
-    private mouseClickEvent mouseClickEvent;
+    private mouseMoveEvent         mouseMoveEvent;
+    private mouseClickEvent        mouseClickEvent;
     private mouseClickReleaseEvent mouseClickReleaseEvent;
-    private dispatcherEvent dispatcherEvent;
+    private dispatcherEvent        dispatcherEvent;
     
     //Thread Pool that takes care of the events 
     private ExecutorService threadPool;
@@ -71,23 +73,36 @@ class xGloveDispatcher {
     public void dispatchEvents() 
     {
     	
+   
     	//if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
     	//keyboard.test();
-    	//System.out.println("test");
+    	System.out.println("test");
     	
     	
         //Always try to move the mouse for now
-    	mouseThread.execute(mouseMoveEvent);
-
+    	
+    	/*
+    	if(moveMouse)
+    	{
+    		mouseThread.execute(mouseMoveEvent);
+    	}
+    	*/
+    	
 	    //Mouse click and release
-	    
+	   
+    	/*
       	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
 	    	threadPool.execute(mouseClickEvent); 
 	    }
 	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
 	    	threadPool.execute(mouseClickReleaseEvent);
-	    }	    
+	    }
+	    else if(gesture.isMouseExitGesture())
+    	{
+    		moveMouse = moveMouse ? false : true;
+    		threadSleep(50);
+    	}	    
 	    //Scrolling is a blocking function. No Thread pool
         if(gesture.isScrollModeGesture()) 
 	    {
@@ -116,12 +131,14 @@ class xGloveDispatcher {
 	        //dispatcherBlocked = true;
 	        keyboard.doLoadPrevious();
 	    }
+        */
 	    /*
 	    else  
 	    {
 	        dispatcherBlocked = false;
 	    }
 	    */
+    	
     }
 
     public static xGloveSensor getSensor() 
