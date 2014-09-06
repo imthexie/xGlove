@@ -36,7 +36,7 @@ class xGloveDispatcher {
     
     //Boolean for if the dispatcher is on a blocking action, don't fire events.
     private volatile boolean dispatcherBlocked;
-
+    
     //Public methods
     public xGloveDispatcher() 
     {
@@ -73,24 +73,28 @@ class xGloveDispatcher {
     public void dispatchEvents() 
     {
     	
-    	
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
-    	System.out.println("test");
+    	//System.out.println("test");
     	
     	/* Move mouse */
-    	if(moveMouse)
-    	{
+    	//if(moveMouse)
+    	//{
     		mouseThread.execute(mouseMoveEvent);
-    	}
-    		
+    	//}
     		
     	/* Gestures */
-      	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) 
+      	/*
+    	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) 
       	{
 	    	mouse.doMouseLeftClick();
       		//threadPool.execute(mouseClickEvent); 
 	    }
+      	
+      	else if(gesture.isDragMouseGesture()) // drag when thumb and index finger are stretched, and middle finger,										
+        {									  // ring finger and pinky are bent 
+            mouse.doDragMouse();
+        }
 	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) 
 	    { 
 	    	mouse.doMouseLeftClickRelease();
@@ -128,6 +132,7 @@ class xGloveDispatcher {
 	    {
 	        dispatcherBlocked = false;
 	    }	
+	    */
     }
 
     public static xGloveSensor getSensor() 

@@ -9,26 +9,26 @@ class xGloveMouse
 {
 	//Used in debug logs
 	private final String TAG = "xGloveMouse";
-	private boolean debugMouse = true;
+	private boolean debugMouse = false;
 	Robot mouseRobot;                   // create object from Robot class;
 	private static final int xRate = 5; // multiplier to adjust movement rate
 	private static final int yRate = 4; // multiplier to adjust movement rate
-
+	
 	xGloveGesture gesture;
-
+		
 	Dimension screen; //Computer screen data
-  
+	
 	int range       =  12;              // output range of X or Y movement
 	int threshold   =  range / 18;      // resting threshold  originally -> /10
 	int center      =  range / 2 ;      // resting position value
 	int minima[]    =  {0,  -40 };      // actual analogRead minima for {x, y}
 	int maxima[]    =  {0,   40 };      // actual analogRead maxima for {x, y}
-
+		
 	//TODO: Test this, and evaluate need to use AtomicInteger
 	int x, y; //coordinates of mouse
-
+	
 	private boolean currentlyClicked;
-
+	
 	public xGloveMouse() 
 	{
 		try 
@@ -126,16 +126,23 @@ class xGloveMouse
 	
 	public void doMouseLeftClick() 
 	{        
-		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
+		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		currentlyClicked = true;    // there is a left click
-		System.out.println("There should be a click.");
+		currentlyClicked = true;                          // there is a left click
+		//System.out.println("There should be a click.");
 	}  
+	
+	public void doDragMouse()
+	{
+		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
+		currentlyClicked = true;                         // there is a left click
+		System.out.println("There should be a click.");
+	}
 	
 	public void doMouseLeftClickRelease() 
 	{
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		System.out.println("false"); 
+		//System.out.println("false"); 
 		currentlyClicked = false;   // there is no left click 
 		try {
 		    Thread.sleep(25);                
@@ -155,13 +162,11 @@ class xGloveMouse
 	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
 	  int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
 	  
-	  
 	  if(debugMouse)
 	  {
 		  System.out.println(TAG + ": moveMouse() : " + "Result   ->   xReading: " + xReading + "\t        yReading " + yReading);
 	  }
-	  
-	  
+	 
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
   }
@@ -205,6 +210,7 @@ class xGloveMouse
       // return the distance for this axis:
       return distance;
   }
+  
 
     /* Function: mouse_scroll
    * ----------------------
