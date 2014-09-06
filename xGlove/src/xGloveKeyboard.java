@@ -62,12 +62,6 @@ class xGloveKeyboard
             xGloveDispatcher.threadSleep(50);
         }   
 	} 
-	
-	public void test()
-	{
-		System.out.println("test");
-		xGloveDispatcher.threadSleep(500);
-	}
 
 	/* Function: load_next_previous
 	 * --------------------

@@ -9,7 +9,7 @@ class xGloveMouse
 {
 	//Used in debug logs
 	private final String TAG = "xGloveMouse";
-	private boolean debugMouse = false;
+	private boolean debugMouse = true;
 	Robot mouseRobot;                   // create object from Robot class;
 	private static final int xRate = 5; // multiplier to adjust movement rate
 	private static final int yRate = 4; // multiplier to adjust movement rate
@@ -106,6 +106,7 @@ class xGloveMouse
 	{
 		//mouseMove moves to a given position
 		moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2); 
+		System.out.println("checkpoint");
 	}
 
     /* Function: mouse_left_click
@@ -128,16 +129,16 @@ class xGloveMouse
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		currentlyClicked = true;    // there is a left click
-		//System.out.println("There should be a click.");
+		System.out.println("There should be a click.");
 	}  
 	
 	public void doMouseLeftClickRelease() 
 	{
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		//System.out.println("false"); 
+		System.out.println("false"); 
 		currentlyClicked = false;   // there is no left click 
 		try {
-		    Thread.sleep(250);                
+		    Thread.sleep(25);                
 		} catch(InterruptedException ex) {
 		    Thread.currentThread().interrupt();
 		}
@@ -258,7 +259,8 @@ class xGloveMouse
 	  this.maxima[0] = maxima[0];
 	  this.maxima[1] = maxima[1];
 	  centerMouse();
-	  if(xGloveController.DEBUG) System.out.println(TAG + ": resetMouse() : " + "Minima[0] : " + this.minima[0] + 
+	  //if(xGloveController.DEBUG) 
+	  System.out.println(TAG + ": resetMouse() : " + "Minima[0] : " + this.minima[0] + 
 			  									"Minima[1] : " + this.minima[1] + "\nMaxima[0] : " + this.maxima[0] + "Maxima[1] : " + this.maxima[1]);
   }
   

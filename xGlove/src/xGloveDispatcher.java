@@ -53,7 +53,7 @@ class xGloveDispatcher {
         gesture = new xGloveGesture();
         mouse = new xGloveMouse(); //Mouse must be constructed after sensor
         keyboard = new xGloveKeyboard();
-
+        
         mouseMoveEvent = new mouseMoveEvent();
         mouseClickEvent = new mouseClickEvent();
         mouseClickReleaseEvent = new mouseClickReleaseEvent();
@@ -73,72 +73,61 @@ class xGloveDispatcher {
     public void dispatchEvents() 
     {
     	
-   
-    	//if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
-    	//keyboard.test();
+    	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
+    	
     	System.out.println("test");
     	
-    	
-        //Always try to move the mouse for now
-    	
-    	/*
+    	/* Move mouse */
     	if(moveMouse)
     	{
     		mouseThread.execute(mouseMoveEvent);
     	}
-    	*/
-    	
-	    //Mouse click and release
-	   
-    	/*
-      	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) {
-	    	threadPool.execute(mouseClickEvent); 
+    		
+    		
+    	/* Gestures */
+      	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) 
+      	{
+	    	mouse.doMouseLeftClick();
+      		//threadPool.execute(mouseClickEvent); 
 	    }
-	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
-	    	threadPool.execute(mouseClickReleaseEvent);
+	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) 
+	    { 
+	    	mouse.doMouseLeftClickRelease();
+	    	//threadPool.execute(mouseClickReleaseEvent);
 	    }
 	    else if(gesture.isMouseExitGesture())
     	{
     		moveMouse = moveMouse ? false : true;
     		threadSleep(50);
     	}	    
-	    //Scrolling is a blocking function. No Thread pool
-        if(gesture.isScrollModeGesture()) 
+	    else if(gesture.isScrollModeGesture()) 
 	    {
-	    	//dispatcherBlocked = true;
 	        mouse.mouseScroll();
 	    }
         else if(gesture.isSpacebarGesture())
     	{
-    		//System.out.println("enter spacebar functionality ");
     		keyboard.doSpacebar();
     	}
-    	else if(gesture.upsideDown()) 
+    	else if(gesture.upsideDown())
 	    {
-	    	//Mac launchpad is a blocking function
-	    	//dispatcherBlocked = true;
+    		dispatcherBlocked = true;
 	        keyboard.doMacLaunchpad();
 	    }  
     	else if(gesture.isLoadNextGesture()) 
 	    {
-	    	//Load next and previous slide is also blocking
-	     	//dispatcherBlocked = true;
+	     	dispatcherBlocked = true;
 	        keyboard.doLoadNext();
 	    } 
     	else if (gesture.isLoadPreviousGesture()) 
 	    {
-	        //dispatcherBlocked = true;
+	        dispatcherBlocked = true;
 	        keyboard.doLoadPrevious();
 	    }
-        */
-	    /*
 	    else  
 	    {
 	        dispatcherBlocked = false;
-	    }
-	    */
-    	
+	    }	
     }
 
     public static xGloveSensor getSensor() 
@@ -146,6 +135,7 @@ class xGloveDispatcher {
         return sensor; 
     }
 
+    
     /**Thread jobs**/
     
     private class dispatcherEvent implements Runnable 
