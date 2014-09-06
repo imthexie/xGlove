@@ -17,7 +17,7 @@ class xGloveGesture
 
     public boolean fist() 
     {
-        return sensor.allFingersBent(72);
+        return sensor.allFingersBent(66);
     }
 
     public boolean fingersBent() 
@@ -91,17 +91,17 @@ class xGloveGesture
     {
     	return !sensor.isFingerBent(Finger.RING, 75) && (sensor.isFingerBent(Finger.MIDDLE, 45));
     }
-
+    
     public boolean isLoadNextGesture() 
+    {
+        return sensor.getOrientation().pitch < -50;
+    }
+    
+    public boolean isLoadPreviousGesture() 
     {
         return sensor.getOrientation().pitch > 70;
     }
-
-    public boolean isLoadPreviousGesture() 
-    {
-        return sensor.getOrientation().pitch < -70;
-    }
-
+    
     public int getInclinationFourFingers() 
     {
         return sensor.getInclinationFourFingers();

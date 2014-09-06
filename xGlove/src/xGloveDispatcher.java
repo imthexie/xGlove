@@ -71,10 +71,10 @@ class xGloveDispatcher {
     public void dispatchEvents() 
     {
     	
-    	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
+    	//if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
     	//keyboard.test();
-    	System.out.println("test");
+    	//System.out.println("test");
     	
     	
         //Always try to move the mouse for now
@@ -87,10 +87,8 @@ class xGloveDispatcher {
 	    }
 	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) { 
 	    	threadPool.execute(mouseClickReleaseEvent);
-	    }
-			    
+	    }	    
 	    //Scrolling is a blocking function. No Thread pool
-	        
         if(gesture.isScrollModeGesture()) 
 	    {
 	    	//dispatcherBlocked = true;
@@ -106,22 +104,19 @@ class xGloveDispatcher {
 	    	//Mac launchpad is a blocking function
 	    	//dispatcherBlocked = true;
 	        keyboard.doMacLaunchpad();
-	    }
-	        
-	    /*
-	    if(gesture.isLoadNextGesture()) 
+	    }  
+    	else if(gesture.isLoadNextGesture()) 
 	    {
 	    	//Load next and previous slide is also blocking
-	     	dispatcherBlocked = true;
+	     	//dispatcherBlocked = true;
 	        keyboard.doLoadNext();
 	    } 
-	    */
-	    /*
-	    if (gesture.isLoadPreviousGesture()) 
+    	else if (gesture.isLoadPreviousGesture()) 
 	    {
-	        dispatcherBlocked = true;
+	        //dispatcherBlocked = true;
 	        keyboard.doLoadPrevious();
 	    }
+	    /*
 	    else  
 	    {
 	        dispatcherBlocked = false;

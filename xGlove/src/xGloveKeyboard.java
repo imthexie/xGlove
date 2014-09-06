@@ -79,41 +79,51 @@ class xGloveKeyboard
 	 */
 	public void doLoadNext()
 	{
-        // right arrow key
-        while(gesture.isLoadNextGesture()) // exit when hand is back in original position
+		// exit when hand is back in original position
+		while(gesture.isLoadNextGesture()) 
         {
-            if(gesture.fingersBent()) //finger should be bend
+			//fingers should be bend
+			if(gesture.fist()) 
             {
-                keyboardRobot.keyPress(KeyEvent.VK_RIGHT); //right arrow key
+            	// right arrow key for presentations
+            	keyboardRobot.keyPress(KeyEvent.VK_RIGHT); 
                 keyboardRobot.keyRelease(KeyEvent.VK_RIGHT);  
                 
-                //Web shortcuts not consistent throughout browsers and OS's
+                // Load next page in browser
+                // Web shortcuts not consistent throughout browsers and OS's
                 keyboardRobot.keyPress(KeyEvent.VK_META);
                 keyboardRobot.keyPress(KeyEvent.VK_CLOSE_BRACKET);
                 keyboardRobot.keyRelease(KeyEvent.VK_META);
                 keyboardRobot.keyRelease(KeyEvent.VK_CLOSE_BRACKET);
                 
-                xGloveDispatcher.threadSleep(1500);  // Thread.sleep between iterations of this function
+                // Thread.sleep between iterations of this function
+                xGloveDispatcher.threadSleep(1500);  
+                
              }             
          }        
     }
 	
     public void doLoadPrevious() 
     {
-        while(gesture.isLoadPreviousGesture()) // exit when hand is back in original position
+    	// exit when hand is back in original position
+        while(gesture.isLoadPreviousGesture()) 
         {
-            if(gesture.fingersBent()) //finger should be bend
+        	//fingers should be bend
+        	if(gesture.fist()) 
             {
-                keyboardRobot.keyPress(KeyEvent.VK_LEFT); //left arrow key
+        		//left arrow key
+        		keyboardRobot.keyPress(KeyEvent.VK_LEFT); 
                 keyboardRobot.keyRelease(KeyEvent.VK_LEFT);
                 
+                // Load previous page in browsers
                 //Web shortcuts not consistent throughout browsers and OS's
                 keyboardRobot.keyPress(KeyEvent.VK_META);
                 keyboardRobot.keyPress(KeyEvent.VK_OPEN_BRACKET);
                 keyboardRobot.keyRelease(KeyEvent.VK_META);
-                keyboardRobot.keyRelease(KeyEvent.VK_OPEN_BRACKET);
-                    
-                xGloveDispatcher.threadSleep(1500);   // Thread.sleep between iterations of this function
+                keyboardRobot.keyRelease(KeyEvent.VK_OPEN_BRACKET);  
+                
+                // Thread.sleep between iterations of this function
+                xGloveDispatcher.threadSleep(1500);   
             }             
         }  
     }
