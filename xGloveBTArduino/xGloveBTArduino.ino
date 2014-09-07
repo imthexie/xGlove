@@ -40,6 +40,7 @@ static int pinkyCurrentValue                =   0;
 int minima[]                                =   {0, -40};          // actual analogRead minima for {x, y}
 int maxima[]                                =   {0,  40};          // actual analogRead maxima for {x, y}
 
+
 //Version tag
 const String VERSION_TAG = "v1";
 const String RESET = "RESET";
@@ -61,8 +62,10 @@ void setup()
     /* of the glove                                                         */  
     if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation))
     {
-         minima[0] = orientation.heading - 50;
-         maxima[0] = orientation.heading + 50;
+        minima[0] = orientation.heading - 50;
+        maxima[0] = orientation.heading + 50;
+        if(minima[0] > orientation.heading) minima[0] -= 360;
+        else if(maxima[0] < orientation.heading) maxima[0] += 360;
     }
     pinMode(13, OUTPUT); //Pin indicates reset
     while(!Serial1);
@@ -80,13 +83,30 @@ void loop()
     } 
     else 
     {      
-      readLocationSensors(false);
-      readFlexSensors();
-      Serial1.println(VERSION_TAG + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
-                      thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
-                      ringFingerCurrentValue + ',' + pinkyCurrentValue);
+        readLocationSensors(false);
+        readFlexSensors();
+        if(maxima[0] != 0 || minima[0] != 0)
+        {
+            if(maxima[0] > 120 && orientation.heading < -120)
+            {
+                Serial1.println(VERSION_TAG + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)(orientation.heading + 360) + ',' +
+                                thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
+                                ringFingerCurrentValue + ',' + pinkyCurrentValue);
+            }
+            else if(minima[0] < -120 && orientation.heading > 120)
+            {
+                Serial1.println(VERSION_TAG + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)(orientation.heading - 360) + ',' +
+                                thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
+                                ringFingerCurrentValue + ',' + pinkyCurrentValue);  
+            }
+            else{
+                Serial1.println(VERSION_TAG + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)(orientation.heading) + ',' +
+                                thumbCurrentValue + ',' + indexFingerCurrentValue + ',' + middleFingerCurrentValue + ',' +
+                                ringFingerCurrentValue + ',' + pinkyCurrentValue);         
+            } 
+        }      
     }
-    delay(1);
+    delay(2);
 } 
 
 void readIncomingData() 
@@ -114,14 +134,29 @@ void readIncomingData()
   }
 }
 
-void sendResetInfo() {
+// Tell the computer/connected device that we are recalibrating
+void sendResetInfo() 
+{
     readLocationSensors(true);
-    // Tell the computer/connected device that we are recalibrating
-    Serial1.println(RESET + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
-                    minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
+    if(maxima[0] != 0 || minima[0] != 0)
+    {
+        if(maxima[0] > 120 && orientation.heading < -120)
+        {
+            Serial1.println(RESET + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)(orientation.heading + 360) + ',' +
+                        minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);
+        }
+        else if(minima[0] < -120 && orientation.heading > 120)
+        {
+            Serial1.println(RESET + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)(orientation.heading - 360) + ',' +
+                            minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]);   
+        }
+        else
+        {
+            Serial1.println(RESET + ',' + ((int)orientation.roll - 10)  + ',' + ((int)orientation.pitch + 12) + ',' + (int)orientation.heading + ',' +
+                            minima[0] + ',' + minima[1] + ',' + maxima[0] + ',' + maxima[1]); 
+        } 
+    }
 }
-
-
 
 void readLocationSensors(boolean setMaxima) 
 {
@@ -133,8 +168,10 @@ void readLocationSensors(boolean setMaxima)
     /* of the glove                                                         */  
     if (dof.fusionGetOrientation(&accel_event, &mag_event, &orientation) && setMaxima)
     {
-         minima[0] = orientation.heading - 50;
-         maxima[0] = orientation.heading + 50;
+        minima[0] = orientation.heading - 50;
+        maxima[0] = orientation.heading + 50;
+        if(minima[0] > orientation.heading) minima[0] -= 360;
+        else if(maxima[0] < orientation.heading) maxima[0] += 360;
     }
 }
 
