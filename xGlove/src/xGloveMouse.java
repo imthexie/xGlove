@@ -11,19 +11,17 @@ class xGloveMouse
 	private final String TAG = "xGloveMouse";
 	private boolean debugMouse = false;
 	Robot mouseRobot;                   // create object from Robot class;
-	private static final int xRate = 5; // multiplier to adjust movement rate
-	private static final int yRate = 4; // multiplier to adjust movement rate
 	
 	xGloveGesture gesture;
-		
-	Dimension screen; //Computer screen data
 	
-	int range       =  12;              // output range of X or Y movement
-	int threshold   =  range / 18;      // resting threshold  originally -> /10
+	Dimension screen; 					//Computer screen data
+	
+	int range       =  48;              // output range of X or Y movement
+	int threshold   =  0;		        // resting threshold  originally -> /10
 	int center      =  range / 2 ;      // resting position value
 	int minima[]    =  {0,  -40 };      // actual analogRead minima for {x, y}
 	int maxima[]    =  {0,   40 };      // actual analogRead maxima for {x, y}
-		
+	
 	//TODO: Test this, and evaluate need to use AtomicInteger
 	int x, y; //coordinates of mouse
 	
@@ -53,7 +51,7 @@ class xGloveMouse
 
 		this.gesture = new xGloveGesture();
 	}
-    
+     
 	// method to move mouse from current position by given offset
 	private void move(int offsetX, int offsetY) 
 	{
@@ -63,25 +61,25 @@ class xGloveMouse
 			System.out.println("\t\t      Current Location y = " + y);
 		}
 		
-		if((x + (xRate * offsetX)) > screen.getWidth())
+		if((x + offsetX) > screen.getWidth())
 		{
 			x = (int)screen.getWidth();
 		}
-		else if((x + (xRate * offsetX)) < 0)
+		else if((x + offsetX) < 0)
 		{
 			x = 0;
 		}
-		else x += (xRate * offsetX);
+		else x += offsetX;
 		
-		if((y + (yRate * offsetY)) > screen.getHeight())
+		if((y + offsetY) > screen.getHeight())
 		{
 			y = (int)screen.getHeight();
 		}
-		else if((y + (yRate * offsetY)) < 0)
+		else if((y + offsetY) < 0)
 		{
 			y = 0;
 		}
-		else y += (yRate * offsetY);
+		else y += offsetY;
 		
 		if(debugMouse)
 		{
@@ -92,6 +90,7 @@ class xGloveMouse
 		}
 		
 		mouseRobot.mouseMove(x, y); //mouseMove moves to a given position
+		
 	}
     
 	//Move mouse to a specified location
@@ -106,7 +105,6 @@ class xGloveMouse
 	{
 		//mouseMove moves to a given position
 		moveTo((int)screen.getWidth() / 2, (int)screen.getHeight() / 2); 
-		System.out.println("checkpoint");
 	}
 
     /* Function: mouse_left_click
@@ -127,22 +125,21 @@ class xGloveMouse
 	public void doMouseLeftClick() 
 	{        
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
-		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		currentlyClicked = true;                          // there is a left click
-		//System.out.println("There should be a click.");
+		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
+		currentlyClicked = true; // there is a left click
+		if(debugMouse) System.out.println("There should be a click.");
 	}  
 	
 	public void doDragMouse()
 	{
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
 		currentlyClicked = true;                         // there is a left click
-		System.out.println("There should be a click.");
+		if(debugMouse) System.out.println("There should be a click.");
 	}
 	
 	public void doMouseLeftClickRelease() 
 	{
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		//System.out.println("false"); 
 		currentlyClicked = false;   // there is no left click 
 		try {
 		    Thread.sleep(25);                
@@ -151,7 +148,7 @@ class xGloveMouse
 		}
 	}
 	
-   /* Function: moveMouse
+  /* Function: moveMouse
    * --------------------
    * This function uses the data from the 9-DOF chip to move the mouse cursor. 
    * The function calls the readAxis function to turn the position of the 
@@ -159,18 +156,20 @@ class xGloveMouse
    */
   public void moveMouse()
   {
-	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0); // x-axis movement
-	  int yReading = getCursorPosition(gesture.getOrientation().roll, 1);    // y-axis movement
+	  if(debugMouse)System.out.println("heading " + gesture.getOrientation().heading);
+	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0);  // x-axis movement
+	  int yReading = getCursorPosition(gesture.getOrientation().roll   , 1);  // y-axis movement
 	  
 	  if(debugMouse)
 	  {
-		  System.out.println(TAG + ": moveMouse() : " + "Result   ->   xReading: " + xReading + "\t        yReading " + yReading);
+		  System.out.println(TAG + ": moveMouse() : " + "Result   ->   xReading: " + xReading + "   yReading: "
+				   			  + yReading);
 	  }
-	 
+	  
 	  //TODO: Make this pixel density independent 
 	  move(xReading, yReading);       // move the mouse
   }
-
+  
     /* Function: get_cursor_position
    * -----------------------------------------------------------------
    * This function is used when moving the mouse. The function turns the
@@ -210,9 +209,8 @@ class xGloveMouse
       // return the distance for this axis:
       return distance;
   }
-  
 
-    /* Function: mouse_scroll
+  /* Function: mouse_scroll
    * ----------------------
    * This function simulates scrolling. The function enters and exits
    * scrolling mode when the ring finger is bent down while the middle finger
@@ -222,7 +220,6 @@ class xGloveMouse
    * bent up, the page scrolls up. The more the finger are bent the higher the 
    * scrolling speed. The scrolling speed is controlled by the for loop. 
    */
-  
   public void mouseScroll()
   {
 	/* delay until user stretches ring finger again */
@@ -235,20 +232,19 @@ class xGloveMouse
     
 	while(!gesture.isScrollModeGesture())
     { 
-	  //System.out.println("Scroll");
-	  int inclinationPercentage = gesture.getInclinationFourFingers();
-      if(inclinationPercentage < 38)         								// scroll up if fingers bent up
-      {
-    	  inclinationPercentage = gesture.getInclinationFourFingers();  
-    	  mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));	// scroll up
-    	  mouseRobot.setAutoDelay(40);
-      }   
-      else if(inclinationPercentage > 53)   								// scroll down if fingers bent down
-      { 
-    	  inclinationPercentage = gesture.getInclinationFourFingers();
-    	  mouseRobot.mouseWheel((int)((52 - inclinationPercentage) / 3));	// scroll down
-		  mouseRobot.setAutoDelay(40);
-      }
+		int inclinationPercentage = gesture.getInclinationFourFingers();
+		if(inclinationPercentage < 38)         								// scroll up if fingers bent up
+		{
+			inclinationPercentage = gesture.getInclinationFourFingers();  
+			mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));	// scroll up
+			mouseRobot.setAutoDelay(40);
+		}   
+		else if(inclinationPercentage > 53)   								// scroll down if fingers bent down
+		{ 
+			inclinationPercentage = gesture.getInclinationFourFingers();
+			mouseRobot.mouseWheel((int)((52 - inclinationPercentage) / 3));	// scroll down
+			mouseRobot.setAutoDelay(40);
+		}
     }
 	
 	/* delay until user stretches ring finger again */
@@ -265,9 +261,12 @@ class xGloveMouse
 	  this.maxima[0] = maxima[0];
 	  this.maxima[1] = maxima[1];
 	  centerMouse();
-	  //if(xGloveController.DEBUG) 
-	  System.out.println(TAG + ": resetMouse() : " + "Minima[0] : " + this.minima[0] + 
-			  									"Minima[1] : " + this.minima[1] + "\nMaxima[0] : " + this.maxima[0] + "Maxima[1] : " + this.maxima[1]);
+	  if(xGloveController.DEBUG)
+	  {
+		  System.out.println(TAG + ": resetMouse() : " + "Minima[0] : " + this.minima[0] + "Minima[1] : " +
+				  		     this.minima[1] + "\nMaxima[0] : " + this.maxima[0] + "Maxima[1] : " + 
+				  		     this.maxima[1]);
+	  }
   }
   
   private long map(long x, long inMin, long inMax, long outMin, long outMax)
