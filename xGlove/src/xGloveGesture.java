@@ -73,7 +73,7 @@ class xGloveGesture
 
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {
-    	return (sensor.allFingersBent(49) && !currentlyClicked && Math.abs(sensor.getOrientation().pitch) < 35);
+    	return (sensor.allFingersBent(45) && !currentlyClicked && Math.abs(sensor.getOrientation().pitch) < 35);
     }
     
     public boolean isDragMouseGesture()
