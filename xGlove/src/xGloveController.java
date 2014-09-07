@@ -22,7 +22,7 @@ public class xGloveController extends PApplet implements KeyListener
 	Serial myPort = null;   // Create object from Serial class
 	                             
 	public static final short LF = 10;        // ASCII linefeed
-	public static int portIndex = 0;  // select the com port, 
+	public static int portIndex = 0;  		  // select the com port, 
 	                                          // 0 is the first port
 	xGloveDispatcher dispatcher;
 
@@ -58,6 +58,7 @@ public class xGloveController extends PApplet implements KeyListener
 		
 		//Query user for COM port. This will be set using a UI setup process later using name of port.
 		println(serialPorts);
+		
 		Scanner reader = new Scanner(System.in);
 		System.out.print("Enter the index of the COM port : ");
 		portIndex = reader.nextInt();
@@ -189,8 +190,8 @@ public class xGloveController extends PApplet implements KeyListener
 	    {
 	      if(DEBUG)
 	      {
-	    	  println("Parse Error : " + message); // parse error
-	    	  println(t.getMessage()); //Print error message
+	    	  println("Parse Error : " + message);  // parse error
+	    	  println(t.getMessage()); 				// Print error message
 	      }
 	    }      
 	  }
