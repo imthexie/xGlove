@@ -39,7 +39,7 @@ class xGloveMouse
 		}
 
 		//Automatic delay after every event fired. TODO: May need adjustment
-		mouseRobot.setAutoDelay(10);
+		mouseRobot.setAutoDelay(15);
 
 		screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -141,13 +141,7 @@ class xGloveMouse
 	{
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		currentlyClicked = false;   // there is no left click 
-		try 
-		{
-		    Thread.sleep(25);                
-		} catch(InterruptedException ex) 
-		{
-		    Thread.currentThread().interrupt();
-		}
+		xGloveDispatcher.threadSleep(25);
 	}
 	
   /* Function: moveMouse
@@ -239,13 +233,13 @@ class xGloveMouse
 		{
 			inclinationPercentage = gesture.getInclinationFourFingers();  
 			mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));	// scroll up
-			mouseRobot.setAutoDelay(40);
+			mouseRobot.delay(40);
 		}   
 		else if(inclinationPercentage > 53)   								// scroll down if fingers bent down
 		{ 
 			inclinationPercentage = gesture.getInclinationFourFingers();
 			mouseRobot.mouseWheel((int)((52 - inclinationPercentage) / 3));	// scroll down
-			mouseRobot.setAutoDelay(40);
+			mouseRobot.delay(40);
 		}
     }
 	
