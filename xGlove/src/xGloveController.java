@@ -238,6 +238,7 @@ public class xGloveController extends PApplet implements KeyListener
 					}
 					if(currTime - timeOfLatestData > 2000) 
 					{
+						if(!isConnected) portIndex++;
 						isConnected = false;
 						connectToPort();
 					}
