@@ -92,22 +92,36 @@ public class xGloveController extends PApplet implements KeyListener
 				myPort = new Serial(this, Serial.list()[portIndex], 115200);
 				myPort.clear();
 				myPort.write('N'); // request reset
-				//If able to create Serial connection and write to it, success
-				break;
+
+				if(checkPort()) break;
 		 	} 
 		 	catch(Exception e) 
 		 	{
-		 		//Connection failed. Try a different port
-				cleanUpPort();
-		 		if(i == 149) 
-		 		{
-		 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");
-		 			System.exit(1);
-		 		}
 		 	}
+			//Connection failed. Try a different port
+			cleanUpPort();
 			//Try different port
 			portIndex++;
+			if(i == 149) 
+	 		{
+	 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");
+	 			System.exit(1);
+	 		}
 		}
+	}
+	
+	private boolean checkPort() 
+	{
+		for(int j = 0; j < 50; j++) 
+		{
+			delay(10);
+			//If able to create Serial connection and write to it, and got the RESET, success
+			if(isConnected) 
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void cleanUpPort() 
@@ -238,7 +252,6 @@ public class xGloveController extends PApplet implements KeyListener
 					}
 					if(currTime - timeOfLatestData > 2000) 
 					{
-						if(!isConnected) portIndex++;
 						isConnected = false;
 						connectToPort();
 					}
