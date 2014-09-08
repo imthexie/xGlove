@@ -24,7 +24,7 @@ public class xGloveController extends PApplet implements KeyListener
 	public static final short LF 		  =  10;          // ASCII linefeed
 	public static int portIndex 		  =  0;  		  // select the com port, 
 	
-	xGloveDispatcher dispatcher;
+	private xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
 	public static boolean DEBUG = true;
