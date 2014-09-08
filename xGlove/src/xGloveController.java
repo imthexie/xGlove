@@ -27,7 +27,7 @@ public class xGloveController extends PApplet implements KeyListener
 	xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	//Is connected to the right port
 	private volatile boolean isConnected;
@@ -40,6 +40,9 @@ public class xGloveController extends PApplet implements KeyListener
 	
 	public void setup() 
 	{	
+		//Put frame in upper right corner. For some OS's, it will work here. Others use the one in draw().
+		frame.setLocation(displayWidth - frame.getWidth(), 0);
+		
 		String[] serialPorts = Serial.list();
 		//Close port when shutting down 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -49,20 +52,14 @@ public class xGloveController extends PApplet implements KeyListener
 		    	if(myPort != null) {
 		    		myPort.clear();
 		    		myPort.write('N'); //Reset bluetooth to send resets
-					myPort.stop(); 	
+		    		
+		    		//TODO: check if a delay is needed to make sure bluetooth reads the reset request
+					cleanUpPort();	
 		    	}
 		    	if(portTimeoutThread != null) portTimeoutThread.quit();
 		    }
 
 		});
-		
-		//Query user for COM port. This will be set using a UI setup process later using name of port.
-		println(serialPorts);
-		
-		Scanner reader = new Scanner(System.in);
-		System.out.print("Enter the index of the COM port : ");
-		portIndex = reader.nextInt();
-		reader.close();
 		
 		isConnected = false;
 		dispatcher = new xGloveDispatcher(); 
@@ -76,6 +73,13 @@ public class xGloveController extends PApplet implements KeyListener
 		for(int i = 0; i < 150; i++) 
 		{
 			String[] serialPorts = Serial.list();
+			
+			//Correct port index if out of bounds
+			if(portIndex >= serialPorts.length) 
+			{
+				portIndex = 0;
+			}
+			
 			if(DEBUG)
 			{
 				println(serialPorts);
@@ -83,22 +87,21 @@ public class xGloveController extends PApplet implements KeyListener
 			}
 			try 
 			{
-				//Close port if opened before
-				if(myPort != null) 
-				{
-					myPort.clear();
-					myPort.stop(); 	
-					myPort.dispose();
-				}
+				cleanUpPort();
 				myPort = new Serial(this, Serial.list()[portIndex], 115200);
 				myPort.clear();
 				myPort.write('N'); // request reset
+				
+				//If able to create Serial connection and write to it, success
 				break;
 		 	} 
 		 	catch(Exception e) 
 		 	{
-		 		myPort = null;
-		 		if(i == 149) {
+		 		//Connection failed. Try a different port
+				cleanUpPort();
+				portIndex++; 
+		 		if(i == 149) 
+		 		{
 		 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");
 		 			System.exit(1);
 		 		}
@@ -107,13 +110,22 @@ public class xGloveController extends PApplet implements KeyListener
 		 	}
 		}
 	}
+	
+	private void cleanUpPort() 
+	{
+		//Close port if opened before
+		if(myPort != null) 
+		{
+			myPort.clear();
+			myPort.stop(); 	
+			myPort = null;
+		}
+	}
 
 	public void draw() 
 	{
-		if(DEBUG)
-		{
-			println("is Connected: " + isConnected);
-		}
+		//Put frame in top right corner
+		frame.setLocation(displayWidth - frame.getWidth(), 0);
 		if(!isConnected) 
 		{
 			try 
@@ -161,11 +173,7 @@ public class xGloveController extends PApplet implements KeyListener
 	      {
 	    	  myPort.clear();
 	    	  myPort.write('N'); //request reset
-	    	  timeOfLatestData = System.currentTimeMillis();
-	    	  if(DEBUG)
-	    	  {
 	    	  throw new Exception(TAG + "Data header was not recognized");
-	    	  }
 	      }
 	      
 	      float orientationRoll = Float.parseFloat(data[1].trim());  
@@ -220,17 +228,19 @@ public class xGloveController extends PApplet implements KeyListener
 				{
 					connectToPort();
 				} 
-				else {
+				else 
+				{
 				
-					//If 5000 milliseconds have passed since last data has been sent, reset in same port.
+					//If 2000 milliseconds have passed since last data has been sent, reset in same port.
 					long currTime = System.currentTimeMillis();
 					if(DEBUG)
 					{
 						println(TAG + ": PortTimeoutThread : CurrTime: " + currTime + " timeOfLatestData: "+ timeOfLatestData + " diff: " + (currTime - timeOfLatestData));
 					}
-					if(currTime - timeOfLatestData > 3000) 
+					if(currTime - timeOfLatestData > 2000) 
 					{
-						setup();
+						isConnected = false;
+						connectToPort();
 					}
 				}
 				try 
