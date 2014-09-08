@@ -73,7 +73,6 @@ public class xGloveController extends PApplet implements KeyListener
 		for(int i = 0; i < 150; i++) 
 		{
 			String[] serialPorts = Serial.list();
-			portIndex++;
 			
 			//Correct port index if out of bounds
 			if(portIndex >= serialPorts.length) 
@@ -108,6 +107,9 @@ public class xGloveController extends PApplet implements KeyListener
 		 		//Wait and try again
 		 		delay(100);
 		 	}
+			//Try different port
+			portIndex++;
+
 		}
 	}
 	
