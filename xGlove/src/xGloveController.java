@@ -124,9 +124,9 @@ public class xGloveController extends PApplet implements KeyListener
 		return false;
 	}
 	
-	private void cleanUpPort() 
-	{
-		//Close port if opened before
+	private void cleanUpPort()  
+	{ 
+		//Close port if opened before 
 		if(myPort != null) 
 		{
 			myPort.clear();

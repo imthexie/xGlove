@@ -37,12 +37,17 @@ class xGloveDispatcher {
     //Boolean for if the dispatcher is on a blocking action, don't fire events.
     private volatile boolean dispatcherBlocked;
     
+    //Counts number of dispatchJobs() executions queued up
+    private volatile int numExecutes;
+    
     //Public methods
     public xGloveDispatcher() 
     {
     	//Dispatcher thread that waits for events
     	dispatcherThread = Executors.newFixedThreadPool(1);
     	dispatcherBlocked = false;
+    	
+    	numExecutes = 0;
     	
     	//Mouse thread
     	mouseThread = Executors.newFixedThreadPool(1);
@@ -68,12 +73,22 @@ class xGloveDispatcher {
 
         sensor.updateOrientation(orientationRoll, orientationPitch, orientationHeading);
         sensor.updateFlexValues(thumbVal, indexVal, middleVal, ringVal, pinkyVal);
-        if(!dispatcherBlocked) dispatcherThread.execute(dispatcherEvent);
+        
+        //Allow up to 3 executes to queue up
+        if(numExecutes < 3 && !dispatcherBlocked) 
+        {
+        	//Increments number of executions queued for dispatcher
+        	numExecutes++;
+        	dispatcherThread.execute(dispatcherEvent);
+        }
     }
     
     //Based on sensor values, do events
     public void dispatchEvents() 
     {
+    	//Decrement number of executions queued for dispatcher
+    	numExecutes--;
+    	
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
     	
     	/* Move mouse */
@@ -134,9 +149,8 @@ class xGloveDispatcher {
 	    {
 	        dispatcherBlocked = false;
 	    }	
-    	
-    	threadSleep(4);
-    	
+    	//CANNOT DELAY in dispatchJobs, or else will run slower than microcontroller sends
+    	//serial data and will queue up very fast
     }
     
     public static xGloveSensor getSensor() 
