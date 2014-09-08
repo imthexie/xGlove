@@ -73,7 +73,7 @@ public class xGloveController extends PApplet implements KeyListener
 		for(int i = 0; i < 150; i++) 
 		{
 			String[] serialPorts = Serial.list();
-			
+			portIndex++;
 			//Correct port index if out of bounds
 			if(portIndex >= serialPorts.length) 
 			{
@@ -84,6 +84,8 @@ public class xGloveController extends PApplet implements KeyListener
 			{
 				println(serialPorts);
 				println(" Connecting to -> " + serialPorts[portIndex]);
+				println(portIndex);
+				println(serialPorts.length);
 			}
 			try 
 			{
@@ -91,15 +93,14 @@ public class xGloveController extends PApplet implements KeyListener
 				myPort = new Serial(this, Serial.list()[portIndex], 115200);
 				myPort.clear();
 				myPort.write('N'); // request reset
-				
+				println("Hi");
 				//If able to create Serial connection and write to it, success
 				break;
 		 	} 
 		 	catch(Exception e) 
 		 	{
 		 		//Connection failed. Try a different port
-				cleanUpPort();
-				portIndex++; 
+				cleanUpPort(); 
 		 		if(i == 149) 
 		 		{
 		 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");

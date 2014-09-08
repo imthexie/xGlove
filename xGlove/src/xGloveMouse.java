@@ -17,7 +17,7 @@ class xGloveMouse
 	Dimension screen; 					//Computer screen data
 	
 	int range       =  48;              // output range of X or Y movement
-	int threshold   =  0;		        // resting threshold  originally -> /10
+	int threshold   =  1;		        // resting threshold  originally -> /10
 	int center      =  range / 2 ;      // resting position value
 	int minima[]    =  {0,  -40 };      // actual analogRead minima for {x, y}
 	int maxima[]    =  {0,   40 };      // actual analogRead maxima for {x, y}
