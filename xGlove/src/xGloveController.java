@@ -21,9 +21,10 @@ public class xGloveController extends PApplet implements KeyListener
 	
 	Serial myPort = null;   // Create object from Serial class
 	                             
-	public static final short LF = 10;        // ASCII linefeed
-	public static int portIndex = 0;  		  // select the com port, 
-	                                          // 0 is the first port
+	public static final short LF 		  =  10;          // ASCII linefeed
+	public static int portIndex 		  =  0;  		  // select the com port, 
+	public static boolean portIndexFound  =  false;		  // indicates whether correct portIndex is known
+	
 	xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
@@ -61,10 +62,9 @@ public class xGloveController extends PApplet implements KeyListener
 
 		});
 		
-		isConnected = false;
-		dispatcher = new xGloveDispatcher(); 
-		
-		portTimeoutThread = new PortTimeoutThread(2000);
+		isConnected        =  false;
+		dispatcher         =  new xGloveDispatcher(); 
+		portTimeoutThread  =  new PortTimeoutThread(2000);
 		portTimeoutThread.start();
 	}
 	
@@ -73,7 +73,7 @@ public class xGloveController extends PApplet implements KeyListener
 		for(int i = 0; i < 150; i++) 
 		{
 			String[] serialPorts = Serial.list();
-			portIndex++;
+			if(!portIndexFound) portIndex++;
 			
 			//Correct port index if out of bounds
 			if(portIndex >= serialPorts.length) 
@@ -85,7 +85,8 @@ public class xGloveController extends PApplet implements KeyListener
 			{
 				println(serialPorts);
 				println(" Connecting to -> " + serialPorts[portIndex]);
-				println("Current portindex: " + portIndex);
+				println("Port index is " + portIndex);
+
 			}
 			try 
 			{
@@ -106,7 +107,7 @@ public class xGloveController extends PApplet implements KeyListener
 		 			System.exit(1);
 		 		}
 		 		//Wait and try again
-		 		delay(100);
+		 		//delay(100);
 		 	}
 		}
 	}
@@ -145,7 +146,7 @@ public class xGloveController extends PApplet implements KeyListener
 	  {
 	    if(DEBUG) println(TAG + "Raw: " + message);
 	    String[] data  = message.split(","); // Split the comma-separated message
-
+	    
 	    try 
 	    {
 	      if("RESET".equals(data[0])) 
@@ -166,6 +167,7 @@ public class xGloveController extends PApplet implements KeyListener
 	    	  myPort.clear();
 	    	  myPort.write('Y');
 	    	  isConnected = true;
+	    	  portIndexFound = true;
 	    	  timeOfLatestData = System.currentTimeMillis();
 	    	  return;
 	      } 
