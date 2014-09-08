@@ -60,6 +60,7 @@ class xGloveDispatcher {
         dispatcherEvent        =      new dispatcherEvent();
     };
 
+    //Called continuously to update sensor values
     public void updateSensorValues(float orientationRoll, float orientationPitch, float orientationHeading, 
                                     int thumbVal, int indexVal, int middleVal, int ringVal, int pinkyVal) 
     {
@@ -70,6 +71,7 @@ class xGloveDispatcher {
         if(!dispatcherBlocked) dispatcherThread.execute(dispatcherEvent);
     }
     
+    //Based on sensor values, do events
     public void dispatchEvents() 
     {
     	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
@@ -95,7 +97,6 @@ class xGloveDispatcher {
 	    }
 	    else if(gesture.isMouseExitGesture())
     	{
-	    	System.out.println("Yeah");
     		moveMouse = moveMouse ? false : true;
     		threadSleep(50);
     	}
@@ -161,7 +162,7 @@ class xGloveDispatcher {
         }
     }
     
-    //A Thread job for moving the mouse
+    //A Thread job for clicking the mouse
     private class mouseClickEvent implements Runnable 
     {
         public mouseClickEvent() {}
@@ -173,6 +174,7 @@ class xGloveDispatcher {
         }
     }
 
+    //Thread job for releasing left mouse click
     private class mouseClickReleaseEvent implements Runnable 
     {
         public mouseClickReleaseEvent() {}
@@ -184,6 +186,7 @@ class xGloveDispatcher {
         }
     }
 
+    //Reset maxima minima values for dispatcher
     public void reset(float orientationRoll, float orientationPitch, float orientationHeading, 
     					int[] minima, int[] maxima) 
     {
@@ -198,6 +201,7 @@ class xGloveDispatcher {
         while (!threadPool.isTerminated()) {}
     }
     
+    //Delay method
     public static void threadSleep(int millis) 
     {
     	try 
