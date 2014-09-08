@@ -64,7 +64,7 @@ class xGloveDispatcher {
     public void updateSensorValues(float orientationRoll, float orientationPitch, float orientationHeading, 
                                     int thumbVal, int indexVal, int middleVal, int ringVal, int pinkyVal) 
     {
-    	if(xGloveController.DEBUG) System.out.println("Updating Sensors");
+    	if(xGloveController.DEBUG) System.out.println(TAG + ": Updating Sensors");
 
         sensor.updateOrientation(orientationRoll, orientationPitch, orientationHeading);
         sensor.updateFlexValues(thumbVal, indexVal, middleVal, ringVal, pinkyVal);
@@ -97,31 +97,38 @@ class xGloveDispatcher {
 	    }
 	    else if(gesture.isMouseExitGesture())
     	{
-    		moveMouse = moveMouse ? false : true;
+    		moveMouse = !moveMouse;
     		threadSleep(50);
     	}
-	    else if(gesture.isScrollModeGesture()) 
+	    else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
 	    {
+	    	dispatcherBlocked = true;
 	        mouse.mouseScroll();
+	        dispatcherBlocked = false;
 	    }
         else if(gesture.isSpacebarGesture())
     	{
+        	dispatcherBlocked = true;
     		keyboard.doSpacebar();
+	        dispatcherBlocked = false;
     	}
-    	else if(gesture.upsideDown())
+    	else if(gesture.upsideDown()) 
 	    {
     		dispatcherBlocked = true;
-	        keyboard.doMacLaunchpad();
+	        keyboard.doMacLaunchpad(); 
+	        dispatcherBlocked = false;
 	    }  
     	else if(gesture.isLoadNextGesture()) 
 	    {
 	     	dispatcherBlocked = true;
 	        keyboard.doLoadNext();
+	        dispatcherBlocked = false;
 	    } 
     	else if (gesture.isLoadPreviousGesture()) 
 	    {
 	        dispatcherBlocked = true;
 	        keyboard.doLoadPrevious();
+	        dispatcherBlocked = false;
 	    }
 	    else  
 	    {
@@ -131,7 +138,7 @@ class xGloveDispatcher {
     	threadSleep(4);
     	
     }
-
+    
     public static xGloveSensor getSensor() 
     { 
         return sensor; 

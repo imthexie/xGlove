@@ -34,7 +34,6 @@ class xGloveGesture
     //Consider implementing this with a Timer instead. Or just make this event a non-delayed event
     public boolean upsideDown()
     {
-        //System.out.println("test upside down");
     	if(Math.abs(sensor.getOrientation().roll) > 170)
         {
             /* This for loop is used to ensure that the glove is upside down */

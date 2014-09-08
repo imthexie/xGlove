@@ -10,7 +10,7 @@ class xGloveMouse
 	//Used in debug logs
 	private final String TAG = "xGloveMouse";
 	private boolean debugMouse = false;
-	Robot mouseRobot;                   // create object from Robot class;
+	Robot mouseRobot;                   //object that controls mouse
 	
 	xGloveGesture gesture;
 	
@@ -141,9 +141,11 @@ class xGloveMouse
 	{
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		currentlyClicked = false;   // there is no left click 
-		try {
+		try 
+		{
 		    Thread.sleep(25);                
-		} catch(InterruptedException ex) {
+		} catch(InterruptedException ex) 
+		{
 		    Thread.currentThread().interrupt();
 		}
 	}
@@ -251,7 +253,7 @@ class xGloveMouse
 	while(!gesture.isReleaseScrollModeGesture()) 
 	{
 		  xGloveDispatcher.threadSleep(20);
-    }     
+    }
   }
   
   public void resetMouse(int[] minima, int[] maxima) 

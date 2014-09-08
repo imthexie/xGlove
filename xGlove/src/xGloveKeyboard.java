@@ -32,7 +32,6 @@ class xGloveKeyboard
 		while(!gesture.isSpacebarReleaseGesture())
 		{
 			xGloveDispatcher.threadSleep(20);
-			//System.out.println("wait for release spacebar");
 		}
 	}
 
