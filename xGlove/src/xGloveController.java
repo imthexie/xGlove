@@ -21,9 +21,9 @@ public class xGloveController extends PApplet implements KeyListener
 	
 	Serial myPort = null;   // Create object from Serial class
 	                             
-	public static final short LF = 10;        // ASCII linefeed
-	public static int portIndex = 0;  		  // select the com port, 
-	                                          // 0 is the first port
+	public static final short LF 		  =  10;          // ASCII linefeed
+	public static int portIndex 		  =  0;  		  // select the com port, 
+	
 	xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
@@ -61,10 +61,9 @@ public class xGloveController extends PApplet implements KeyListener
 
 		});
 		
-		isConnected = false;
-		dispatcher = new xGloveDispatcher(); 
-		
-		portTimeoutThread = new PortTimeoutThread(2000);
+		isConnected        =  false;
+		dispatcher         =  new xGloveDispatcher(); 
+		portTimeoutThread  =  new PortTimeoutThread(2000);
 		portTimeoutThread.start();
 	}
 	
@@ -84,7 +83,8 @@ public class xGloveController extends PApplet implements KeyListener
 			{
 				println(serialPorts);
 				println(" Connecting to -> " + serialPorts[portIndex]);
-				println("Current portindex: " + portIndex);
+				println("Port index is " + portIndex);
+
 			}
 			try 
 			{
@@ -104,12 +104,9 @@ public class xGloveController extends PApplet implements KeyListener
 		 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");
 		 			System.exit(1);
 		 		}
-		 		//Wait and try again
-		 		delay(100);
 		 	}
 			//Try different port
 			portIndex++;
-
 		}
 	}
 	
@@ -147,7 +144,7 @@ public class xGloveController extends PApplet implements KeyListener
 	  {
 	    if(DEBUG) println(TAG + "Raw: " + message);
 	    String[] data  = message.split(","); // Split the comma-separated message
-
+	    
 	    try 
 	    {
 	      if("RESET".equals(data[0])) 
