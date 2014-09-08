@@ -23,7 +23,6 @@ public class xGloveController extends PApplet implements KeyListener
 	                             
 	public static final short LF 		  =  10;          // ASCII linefeed
 	public static int portIndex 		  =  0;  		  // select the com port, 
-	public static boolean portIndexFound  =  false;		  // indicates whether correct portIndex is known
 	
 	xGloveDispatcher dispatcher;
 
@@ -73,7 +72,6 @@ public class xGloveController extends PApplet implements KeyListener
 		for(int i = 0; i < 150; i++) 
 		{
 			String[] serialPorts = Serial.list();
-			if(!portIndexFound) portIndex++;
 			
 			//Correct port index if out of bounds
 			if(portIndex >= serialPorts.length) 
@@ -106,9 +104,9 @@ public class xGloveController extends PApplet implements KeyListener
 		 			System.out.println("Could not connect to to the port. Please reset the bluetooth connection.");
 		 			System.exit(1);
 		 		}
-		 		//Wait and try again
-		 		//delay(100);
 		 	}
+			//Try different port
+			portIndex++;
 		}
 	}
 	
@@ -167,7 +165,6 @@ public class xGloveController extends PApplet implements KeyListener
 	    	  myPort.clear();
 	    	  myPort.write('Y');
 	    	  isConnected = true;
-	    	  portIndexFound = true;
 	    	  timeOfLatestData = System.currentTimeMillis();
 	    	  return;
 	      } 
