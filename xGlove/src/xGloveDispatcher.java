@@ -1,6 +1,5 @@
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 
 /**
 * Event Dispatcher that is meant to be run inside a firmware 
@@ -15,7 +14,7 @@ class xGloveDispatcher {
 	//Used in debug logs
 	private final String TAG = "xGloveDispatcher";
 	
-	private static boolean moveMouse = true;
+	private volatile boolean moveMouse = true;
 	
     //Finger and sensor values. TODO: Investigate need to use Atomic for concurrency
     public static xGloveSensor sensor;
@@ -25,8 +24,6 @@ class xGloveDispatcher {
     
     //Assorted jobs and events for the threads to do
     private mouseMoveEvent         mouseMoveEvent;
-    private mouseClickEvent        mouseClickEvent;
-    private mouseClickReleaseEvent mouseClickReleaseEvent;
     private dispatcherEvent        dispatcherEvent;
     
     //Thread Pool that takes care of the events 
@@ -37,8 +34,9 @@ class xGloveDispatcher {
     //Boolean for if the dispatcher is on a blocking action, don't fire events.
     private volatile boolean dispatcherBlocked;
     
-    //Counts number of dispatchJobs() executions queued up
+    //Counts number of executions queued up
     private volatile int numExecutes;
+    private volatile int numMouseExecutes;
     
     //Public methods
     public xGloveDispatcher() 
@@ -48,6 +46,7 @@ class xGloveDispatcher {
     	dispatcherBlocked = false;
     	
     	numExecutes = 0;
+    	numMouseExecutes = 0;
     	
     	//Mouse thread
     	mouseThread = Executors.newFixedThreadPool(1);
@@ -60,8 +59,6 @@ class xGloveDispatcher {
         keyboard               =      new xGloveKeyboard();
         
         mouseMoveEvent         =      new mouseMoveEvent();
-        mouseClickEvent        =      new mouseClickEvent();
-        mouseClickReleaseEvent =      new mouseClickReleaseEvent();
         dispatcherEvent        =      new dispatcherEvent();
     };
 
@@ -69,7 +66,7 @@ class xGloveDispatcher {
     public void updateSensorValues(float orientationRoll, float orientationPitch, float orientationHeading, 
                                     int thumbVal, int indexVal, int middleVal, int ringVal, int pinkyVal) 
     {
-    	if(xGloveController.DEBUG) System.out.println(TAG + ": Updating Sensors");
+    	if(Debug.MAIN_DEBUG) System.out.println(TAG + ": Updating Sensors");
 
         sensor.updateOrientation(orientationRoll, orientationPitch, orientationHeading);
         sensor.updateFlexValues(thumbVal, indexVal, middleVal, ringVal, pinkyVal);
@@ -81,37 +78,35 @@ class xGloveDispatcher {
         	numExecutes++;
         	dispatcherThread.execute(dispatcherEvent);
         }
+        
+        if(moveMouse && !dispatcherBlocked && numMouseExecutes < 3) 
+        {
+        	numMouseExecutes++;
+        	/* Move mouse continuously when dispatcher is not blocked*/
+        	mouseThread.execute(mouseMoveEvent);
+        }
     }
     
     //Based on sensor values, do events
     public void dispatchEvents() 
     {
-    	//Decrement number of executions queued for dispatcher
-    	numExecutes--;
-    	
-    	if(xGloveController.DEBUG) System.out.println("Dispatching Events");
-    	
-    	/* Move mouse */
-    	if(moveMouse)
-    	{
-    		mouseThread.execute(mouseMoveEvent);
-    	}
+    	if(Debug.MAIN_DEBUG) System.out.println("Dispatching Events");
     	
     	/* Gestures */
-    	if(gesture.isDragMouseGesture())      // drag when thumb and index finger are stretched, and middle finger,										
+    	if(gesture.isDragMouseGesture(mouse.isCurrentlyClicked()))      // drag when thumb and index finger are stretched, and middle finger,										
         {								      // ring finger and pinky are bent 
-    		System.out.println("Drag");
+    		if(Debug.DEBUG_MOUSE) System.out.println("Drag");
     		mouse.doDragMouse();
         }
     	else if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked()))
       	{
-    		System.out.println("Click");
-    		threadPool.execute(mouseClickEvent);
-	    }
+    		if(Debug.DEBUG_MOUSE) System.out.println("Click");
+    		mouse.doMouseLeftClick();
+      	}
     	else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked()))
 	    { 
-    		System.out.println("Release");
-    		threadPool.execute(mouseClickReleaseEvent);
+    		if(Debug.DEBUG_MOUSE) System.out.println("Release");
+    		mouse.doMouseLeftClickRelease();
 	    }
     	
     	
@@ -175,6 +170,8 @@ class xGloveDispatcher {
     	@Override 
     	public void run() 
         {
+        	//Decrement number of executions queued for dispatcher
+    		numExecutes--;
     		dispatchEvents();
     	}
     }
@@ -187,31 +184,9 @@ class xGloveDispatcher {
         @Override
         public void run() 
         {
+        	//Decrement number of executions queued for mouse
+        	numMouseExecutes--;
             mouse.moveMouse();
-        }
-    }
-    
-    //A Thread job for clicking the mouse
-    private class mouseClickEvent implements Runnable 
-    {
-        public mouseClickEvent() {}
-
-        @Override
-        public void run() 
-        {
-            mouse.doMouseLeftClick();
-        }
-    }
-
-    //Thread job for releasing left mouse click
-    private class mouseClickReleaseEvent implements Runnable 
-    {
-        public mouseClickReleaseEvent() {}
-
-        @Override
-        public void run() 
-        {
-            mouse.doMouseLeftClickRelease();
         }
     }
 
