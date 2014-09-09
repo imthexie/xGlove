@@ -116,7 +116,6 @@ class xGloveMouse
    * the glove first has to be returned to the non-click position (currently_clicked
    * then becomes zero). 
    */ 
-	
 	public boolean isCurrentlyClicked() 
 	{ 
 		return currentlyClicked; 
@@ -124,23 +123,24 @@ class xGloveMouse
 	
 	public void doMouseLeftClick() 
 	{        
-		currentlyClicked = true;
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
+		currentlyClicked = true;
+		xGloveDispatcher.threadSleep(20);
 		if(debugMouse) System.out.println("There should be a click.");
 	}  
 	
 	public void doDragMouse()
 	{
+		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click
 		currentlyClicked = true;
-		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
+		xGloveDispatcher.threadSleep(20);
 	}
 	
 	public void doMouseLeftClickRelease() 
 	{
-		currentlyClicked = false;   // there is no left click 
-		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
-		xGloveDispatcher.threadSleep(25);
+		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
+		currentlyClicked = false;                         // there is no left click 
 	}
 	
   /* Function: moveMouse
