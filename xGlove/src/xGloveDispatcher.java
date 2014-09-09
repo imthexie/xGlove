@@ -79,7 +79,7 @@ class xGloveDispatcher {
         	dispatcherThread.execute(dispatcherEvent);
         }
         
-        if(moveMouse && !dispatcherBlocked && numMouseExecutes < 3) 
+        if(moveMouse && !dispatcherBlocked && numMouseExecutes < 3 && gesture.isStable()) 
         {
         	numMouseExecutes++;
         	/* Move mouse continuously when dispatcher is not blocked*/
@@ -104,25 +104,21 @@ class xGloveDispatcher {
     		mouse.doMouseLeftClick();
       	}
     	else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked()))
-	    { 
+	{ 
     		if(Debug.DEBUG_MOUSE) System.out.println("Release");
     		mouse.doMouseLeftClickRelease();
-	    }
-    	
-    	
-    	
-    	/*
-	    else if(gesture.isMouseExitGesture())
+	}
+	else if(gesture.isMouseExitGesture())
     	{
     		moveMouse = !moveMouse;
     		threadSleep(50);
     	}
-	    else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
-	    {
+	else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
+	{
 	    	dispatcherBlocked = true;
 	        mouse.mouseScroll();
 	        dispatcherBlocked = false;
-	    }
+	}
         else if(gesture.isSpacebarGesture())
     	{
         	dispatcherBlocked = true;
@@ -130,30 +126,27 @@ class xGloveDispatcher {
 	        dispatcherBlocked = false;
     	}
     	else if(gesture.upsideDown()) 
-	    {
+	{
     		dispatcherBlocked = true;
 	        keyboard.doMacLaunchpad(); 
 	        dispatcherBlocked = false;
-	    }  
+	}  
     	else if(gesture.isLoadNextGesture()) 
-	    {
+	{
 	     	dispatcherBlocked = true;
 	        keyboard.doLoadNext();
 	        dispatcherBlocked = false;
-	    } 
+	} 
     	else if (gesture.isLoadPreviousGesture()) 
-	    {
+	{
 	        dispatcherBlocked = true;
 	        keyboard.doLoadPrevious();
 	        dispatcherBlocked = false;
-	    }
-	    */
-	    else  
-	    {
+	}
+	else  
+	{
 	        dispatcherBlocked = false;
-	    }	
-    	//CANNOT DELAY in dispatchJobs, or else will run slower than microcontroller sends
-    	//serial data and will queue up very fast
+	}	
     }
     
     public static xGloveSensor getSensor() 
