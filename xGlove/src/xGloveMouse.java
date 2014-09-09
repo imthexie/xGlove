@@ -16,9 +16,9 @@ class xGloveMouse
 	
 	Dimension screen; 					//Computer screen data
 	
-	int range       =  48;              // output range of X or Y movement
-	int threshold   =  1;		        // resting threshold  originally -> /10
-	int center      =  range / 2 ;      // resting position value
+	static int range       =  48;              // output range of X or Y movement
+	static int threshold   =  1;		        // resting threshold  originally -> /10
+	static int center      =  range / 2 ;      // resting position value
 	int minima[]    =  {0,  -40 };      // actual analogRead minima for {x, y}
 	int maxima[]    =  {0,   40 };      // actual analogRead maxima for {x, y}
 	
@@ -124,23 +124,22 @@ class xGloveMouse
 	
 	public void doMouseLeftClick() 
 	{        
+		currentlyClicked = true;
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
-		currentlyClicked = true; // there is a left click
 		if(debugMouse) System.out.println("There should be a click.");
 	}  
 	
 	public void doDragMouse()
 	{
+		currentlyClicked = true;
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);  // left click 
-		currentlyClicked = true;                         // there is a left click
-		if(debugMouse) System.out.println("There should be a click.");
 	}
 	
 	public void doMouseLeftClickRelease() 
 	{
-		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		currentlyClicked = false;   // there is no left click 
+		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); //release click
 		xGloveDispatcher.threadSleep(25);
 	}
 	
@@ -166,7 +165,7 @@ class xGloveMouse
 	  move(xReading, yReading);       // move the mouse
   }
   
-    /* Function: get_cursor_position
+  /* Function: get_cursor_position
    * -----------------------------------------------------------------
    * This function is used when moving the mouse. The function turns the
    * position of the glove into a corresponding position of the mouse cursor
@@ -178,6 +177,9 @@ class xGloveMouse
       if(xGloveController.DEBUG && axisNumber == 0) System.out.println(TAG + ": getCursorPostion(): " + "x - axis ->  " + " Input heading: " + heading);
       if(xGloveController.DEBUG && axisNumber == 1) System.out.println(TAG + ": getCursorPostion(): " + "y - axis ->  " + " Input heading:   " + heading);
 
+      if((int)heading > maxima[axisNumber]) heading = maxima[axisNumber];
+      else if((int)heading < minima[axisNumber]) heading = minima[axisNumber];
+      
       // map the reading from the analog input range to the output range:
       heading = map((int)heading, minima[axisNumber], maxima[axisNumber], 0, range);
       

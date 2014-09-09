@@ -54,10 +54,10 @@ class xGloveGesture
     
     public boolean rightSideUp()
     {
-        return Math.abs(sensor.getOrientation().roll) < 50;
+        return Math.abs(sensor.getOrientation().roll) < 40;
     } 
 
-    //TODO: gesture for spacebar
+    // TODO: gesture for spacebar
     public boolean isSpacebarGesture() 
     {
         if(fist() && Math.abs(sensor.getOrientation().pitch) < 30) return true;
@@ -72,20 +72,27 @@ class xGloveGesture
 
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {
-    	return (sensor.allFingersBent(45) && !currentlyClicked && Math.abs(sensor.getOrientation().pitch) < 35);
+    	return (sensor.fourFingersBent(65) && (!currentlyClicked) && Math.abs(sensor.getOrientation().pitch) < 35); 
     }
     
     public boolean isDragMouseGesture()
     {
-    	System.out.println("ring bent "+ (sensor.isFingerBent(Finger.RING, 78)));
-    	System.out.println("middle bent "+ (sensor.isFingerBent(Finger.MIDDLE, 78)));
-    	System.out.println("index not bent "+ (!sensor.isFingerBent(Finger.INDEX, 45)));
-    	return (sensor.isFingerBent(Finger.RING, 78) && sensor.isFingerBent(Finger.MIDDLE, 78) && !sensor.isFingerBent(Finger.INDEX, 45));
+    	System.out.println("ring bent "+ (sensor.isFingerBent(Finger.RING, 72)));
+    	System.out.println("middle bent "+ (sensor.isFingerBent(Finger.MIDDLE, 75)));
+    	System.out.println("index not bent "+ (!sensor.isFingerBent(Finger.INDEX, 50)));
+    	return (sensor.isFingerBent(Finger.RING, 72) && sensor.isFingerBent(Finger.MIDDLE, 75) && (!sensor.isFingerBent(Finger.INDEX, 50)));
+    }
+    
+    public boolean isDragReleaseGesture()
+    {
+    	System.out.println("ring release "+ (!sensor.isFingerBent(Finger.RING, 63)));
+    	System.out.println("middle release "+ (!sensor.isFingerBent(Finger.MIDDLE, 63)));
+    	System.out.println("index bent -> release "+ sensor.isFingerBent(Finger.INDEX, 55));
+    	return ((!sensor.isFingerBent(Finger.RING, 63)) || (!sensor.isFingerBent(Finger.MIDDLE, 63)) || sensor.isFingerBent(Finger.INDEX, 55));
     }
 
     public boolean isMouseReleaseGesture(boolean currentlyClicked) 
     {
-    	//System.out.println("Currently clicked: " + currentlyClicked);
     	return currentlyClicked && sensor.allFingersSpread();
     }
     
@@ -102,7 +109,7 @@ class xGloveGesture
     public boolean isMouseExitGesture()
     {
     	if(sensor.getOrientation().roll > 50 && sensor.getOrientation().roll < 90 &&
-    	   Math.abs(sensor.getOrientation().pitch) < 20)
+    	   Math.abs(sensor.getOrientation().pitch) < 30)
     	{
     		for(int i = 0; i < 800; i++)
     		{

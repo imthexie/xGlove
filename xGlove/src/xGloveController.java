@@ -27,7 +27,7 @@ public class xGloveController extends PApplet implements KeyListener
 	private xGloveDispatcher dispatcher;
 
 	//Set this to false to not log message receipts
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	//Is connected to the right port
 	private volatile boolean isConnected;

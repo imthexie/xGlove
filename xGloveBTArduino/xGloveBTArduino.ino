@@ -106,7 +106,7 @@ void loop()
             } 
         }      
     }
-    delay(2);
+    delay(15);
 } 
 
 void readIncomingData() 

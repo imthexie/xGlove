@@ -42,6 +42,7 @@ class xGloveSensor
 	public xGloveSensor() 
 	{
 		thumbBent 		   =  85;
+		indexBent 		   =  75;
 		middleBent         =  80;
 	    ringBent           =  120;
 	    pinkyBent          =  50;
@@ -122,7 +123,7 @@ class xGloveSensor
 	
 	public boolean allFingersSpread() 
 	{
-		boolean allSpread = !allFingersBent(40);
+		boolean allSpread = !fourFingersBent(62);
 		//System.out.println(TAG + " allFingersSpread(): " + allSpread); 
 		if(xGloveController.DEBUG) System.out.println(TAG + " allFingersSpread(): Is Bent: " + allSpread); 
 		return allSpread;

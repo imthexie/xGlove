@@ -95,21 +95,32 @@ class xGloveDispatcher {
     	if(moveMouse)
     	{
     		mouseThread.execute(mouseMoveEvent);
-    	}
+    	} 
     	
     	/* Gestures */
     	if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked())) 
       	{
-	    	threadPool.execute(mouseClickEvent); 
+    		System.out.println("Click");
+    		threadPool.execute(mouseClickEvent); 
 	    }
-    	else if(gesture.isDragMouseGesture()) // drag when thumb and index finger are stretched, and middle finger,										
-        {								      // ring finger and pinky are bent 
-            mouse.doDragMouse();
-        }
-	    else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) 
+    	else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked())) //|| gesture.isDragReleaseGesture()) 
 	    { 
-	    	threadPool.execute(mouseClickReleaseEvent);
+    		System.out.println("Release");
+    		threadPool.execute(mouseClickReleaseEvent);
 	    }
+    	
+    	/*else if(gesture.isDragMouseGesture()) // drag when thumb and index finger are stretched, and middle finger,										
+        {								      // ring finger and pinky are bent 
+    		System.out.println("Drag");
+    		mouse.doDragMouse();
+        }
+    	else if(gesture.isDragReleaseGesture() && mouse.isCurrentlyClicked())
+	    { 
+    		System.out.println("Release");
+    		threadPool.execute(mouseClickReleaseEvent);
+	    }*/
+    	
+    	/*
 	    else if(gesture.isMouseExitGesture())
     	{
     		moveMouse = !moveMouse;
@@ -145,6 +156,7 @@ class xGloveDispatcher {
 	        keyboard.doLoadPrevious();
 	        dispatcherBlocked = false;
 	    }
+	    */
 	    else  
 	    {
 	        dispatcherBlocked = false;
