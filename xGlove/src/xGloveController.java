@@ -1,6 +1,5 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Scanner;
 
 import processing.core.*;
 import processing.serial.*;
@@ -8,7 +7,7 @@ import processing.serial.*;
 	
 public class xGloveController extends PApplet implements KeyListener
 {
-	//Used in debug logs
+	//Used in Debug.MAIN_DEBUG logs
 	private final String TAG = "xGloveController";
 	
 	//Used for tracking versions of this class. Eclipse complains about not declaring this for some reason.
@@ -25,9 +24,6 @@ public class xGloveController extends PApplet implements KeyListener
 	public static int portIndex 		  =  0;  		  // select the com port, 
 	
 	private xGloveDispatcher dispatcher;
-
-	//Set this to false to not log message receipts
-	public static boolean DEBUG = false;
 	
 	//Is connected to the right port
 	private volatile boolean isConnected;
@@ -79,7 +75,7 @@ public class xGloveController extends PApplet implements KeyListener
 				portIndex = 0;
 			}
 			
-			if(DEBUG)
+			if(Debug.MAIN_DEBUG)
 			{
 				println(serialPorts);
 				println(" Connecting to -> " + serialPorts[portIndex]);
@@ -156,7 +152,7 @@ public class xGloveController extends PApplet implements KeyListener
 	  String message = myPort.readStringUntil(LF); // read serial data
 	  if(message != null)
 	  {
-	    if(DEBUG) println(TAG + "Raw: " + message);
+	    if(Debug.MAIN_DEBUG) println(TAG + "Raw: " + message);
 	    String[] data  = message.split(","); // Split the comma-separated message
 	    
 	    try 
@@ -201,7 +197,7 @@ public class xGloveController extends PApplet implements KeyListener
 	            
 	      dispatcher.updateSensorValues(orientationRoll, orientationPitch, orientationHeading, thumb, index, middle, ring, pinky);
     	  timeOfLatestData = System.currentTimeMillis();
-	      if(DEBUG) 
+	      if(Debug.MAIN_DEBUG) 
 	      {
 	        println(TAG + " serialEvent() : Received : Pitch:" + orientationPitch + ", Heading: " + orientationHeading + ", Roll: " + orientationRoll);
 	        println(TAG + " serialEvent() : Flex sensors: " + index + ", " + middle + ", " + ring + ", " + pinky);
@@ -209,7 +205,7 @@ public class xGloveController extends PApplet implements KeyListener
 	    }
 	    catch (Throwable t) 
 	    {
-	      if(DEBUG)
+	      if(Debug.MAIN_DEBUG)
 	      {
 	    	  println("Parse Error : " + message);  // parse error
 	    	  println(t.getMessage()); 				// Print error message
@@ -246,7 +242,7 @@ public class xGloveController extends PApplet implements KeyListener
 				
 					//If 2000 milliseconds have passed since last data has been sent, reset in same port.
 					long currTime = System.currentTimeMillis();
-					if(DEBUG)
+					if(Debug.MAIN_DEBUG)
 					{
 						println(TAG + ": PortTimeoutThread : CurrTime: " + currTime + " timeOfLatestData: "+ timeOfLatestData + " diff: " + (currTime - timeOfLatestData));
 					}

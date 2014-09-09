@@ -9,7 +9,6 @@ class xGloveMouse
 {
 	//Used in debug logs
 	private final String TAG = "xGloveMouse";
-	private boolean debugMouse = false;
 	Robot mouseRobot;                   //object that controls mouse
 	
 	xGloveGesture gesture;
@@ -25,7 +24,7 @@ class xGloveMouse
 	//TODO: Test this, and evaluate need to use AtomicInteger
 	int x, y; //coordinates of mouse
 	
-	private boolean currentlyClicked;
+	private volatile boolean currentlyClicked;
 	
 	public xGloveMouse() 
 	{
@@ -55,7 +54,7 @@ class xGloveMouse
 	// method to move mouse from current position by given offset
 	private void move(int offsetX, int offsetY) 
 	{
-		if(debugMouse)
+		if(Debug.DEBUG_MOUSE)
 		{
 			System.out.print("Current Location x = " + x);
 			System.out.println("\t\t      Current Location y = " + y);
@@ -81,7 +80,7 @@ class xGloveMouse
 		}
 		else y += offsetY;
 		
-		if(debugMouse)
+		if(Debug.DEBUG_MOUSE)
 		{
 			System.out.print(TAG + ": move(): " + "New Location x = " + x);
 			System.out.println("\t\t      New Location y = " + y);
@@ -122,19 +121,18 @@ class xGloveMouse
 	}
 	
 	public void doMouseLeftClick() 
-	{        
+	{    
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
-		currentlyClicked = true;
 		xGloveDispatcher.threadSleep(20);
-		if(debugMouse) System.out.println("There should be a click.");
+		if(Debug.DEBUG_MOUSE) System.out.println("There should be a click.");
 	}  
 	
 	public void doDragMouse()
 	{
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click
-		currentlyClicked = true;
 		xGloveDispatcher.threadSleep(20);
+		currentlyClicked = false;                         // there is no left click 
 	}
 	
 	public void doMouseLeftClickRelease() 
@@ -151,11 +149,11 @@ class xGloveMouse
    */
   public void moveMouse()
   {
-	  if(debugMouse)System.out.println("heading " + gesture.getOrientation().heading);
+	  if(Debug.DEBUG_MOUSE)System.out.println("heading " + gesture.getOrientation().heading);
 	  int xReading = getCursorPosition(gesture.getOrientation().heading, 0);  // x-axis movement
 	  int yReading = getCursorPosition(gesture.getOrientation().roll   , 1);  // y-axis movement
 	  
-	  if(debugMouse)
+	  if(Debug.DEBUG_MOUSE)
 	  {
 		  System.out.println(TAG + ": moveMouse() : " + "Result   ->   xReading: " + xReading + "   yReading: "
 				   			  + yReading);
@@ -174,8 +172,8 @@ class xGloveMouse
   private int getCursorPosition(float heading, int axisNumber) 
   {
       int distance = 0;    // distance from center of the output range
-      if(xGloveController.DEBUG && axisNumber == 0) System.out.println(TAG + ": getCursorPostion(): " + "x - axis ->  " + " Input heading: " + heading);
-      if(xGloveController.DEBUG && axisNumber == 1) System.out.println(TAG + ": getCursorPostion(): " + "y - axis ->  " + " Input heading:   " + heading);
+      if(Debug.MAIN_DEBUG && axisNumber == 0) System.out.println(TAG + ": getCursorPostion(): " + "x - axis ->  " + " Input heading: " + heading);
+      if(Debug.MAIN_DEBUG && axisNumber == 1) System.out.println(TAG + ": getCursorPostion(): " + "y - axis ->  " + " Input heading:   " + heading);
 
       if((int)heading > maxima[axisNumber]) heading = maxima[axisNumber];
       else if((int)heading < minima[axisNumber]) heading = minima[axisNumber];
@@ -191,7 +189,7 @@ class xGloveMouse
       // map the movement correctly:
 
 
-      if(debugMouse)
+      if(Debug.DEBUG_MOUSE)
       {
     	  if(axisNumber == 0)
     	  {
@@ -258,8 +256,10 @@ class xGloveMouse
 	  this.minima[1] = minima[1];
 	  this.maxima[0] = maxima[0];
 	  this.maxima[1] = maxima[1];
+	  
 	  centerMouse();
-	  if(xGloveController.DEBUG)
+	  
+	  if(Debug.MAIN_DEBUG)
 	  {
 		  System.out.println(TAG + ": resetMouse() : " + "Minima[0] : " + this.minima[0] + "Minima[1] : " +
 				  		     this.minima[1] + "\nMaxima[0] : " + this.maxima[0] + "Maxima[1] : " + 

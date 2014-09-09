@@ -75,7 +75,7 @@ class xGloveSensor
 		this.middleVal = middleVal;
 		this.ringVal = ringVal;
 		this.pinkyVal = pinkyVal;
-		if(xGloveController.DEBUG) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
+		if(Debug.MAIN_DEBUG) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
 				+ " Index: " + this.indexVal + " Middle: " + this.middleVal + " Ring: " + this.ringVal + " Pinky: " + this.pinkyVal);
 	}
 	
@@ -85,7 +85,7 @@ class xGloveSensor
 	    orientation.pitch = pitch;
 	    orientation.heading = heading;
 	    
-	    if(xGloveController.DEBUG) System.out.println(TAG + " updateOrientation(): " + "Roll: " + orientation.roll 
+	    if(Debug.MAIN_DEBUG) System.out.println(TAG + " updateOrientation(): " + "Roll: " + orientation.roll 
 	    											+ " Pitch: " + orientation.pitch + " Heading: " + orientation.heading);
   	}
 		
@@ -125,7 +125,7 @@ class xGloveSensor
 	{
 		boolean allSpread = !fourFingersBent(62);
 		//System.out.println(TAG + " allFingersSpread(): " + allSpread); 
-		if(xGloveController.DEBUG) System.out.println(TAG + " allFingersSpread(): Is Bent: " + allSpread); 
+		if(Debug.MAIN_DEBUG) System.out.println(TAG + " allFingersSpread(): Is Bent: " + allSpread); 
 		return allSpread;
 	}
 	

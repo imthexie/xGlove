@@ -72,15 +72,35 @@ class xGloveGesture
 
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {
-    	//System.out.println("Click " + (!currentlyClicked));
-    	return (sensor.fourFingersBent(65) && (!currentlyClicked) && Math.abs(sensor.getOrientation().pitch) < 35); 
+    	//Don't fire if currently clicked
+    	if(currentlyClicked)
+    	{
+    		return false;
+    	}
+    	else 
+    	{
+    		currentlyClicked = true;
+    	}
+    	return sensor.fourFingersBent(65) && Math.abs(sensor.getOrientation().pitch) < 35; 
     }
     
-    public boolean isDragMouseGesture()
+    public boolean isDragMouseGesture(boolean currentlyClicked)
     {
-    	//System.out.println("ring bent "+ (sensor.isFingerBent(Finger.RING, 72)));
-    	//System.out.println("middle bent "+ (sensor.isFingerBent(Finger.MIDDLE, 75)));
-    	//System.out.println("index not bent "+ (!sensor.isFingerBent(Finger.INDEX, 50)));
+    	if(currentlyClicked)
+    	{
+    		return false;
+    	}
+    	else 
+    	{
+    		currentlyClicked = true;
+    	}
+    	
+    	if(Debug.DEBUG_MOUSE)
+    	{
+    		System.out.println("ring bent "+ (sensor.isFingerBent(Finger.RING, 72)));
+    		System.out.println("middle bent "+ (sensor.isFingerBent(Finger.MIDDLE, 75)));
+    		System.out.println("index not bent "+ (!sensor.isFingerBent(Finger.INDEX, 50)));
+    	}
     	return (sensor.isFingerBent(Finger.RING, 72) && sensor.isFingerBent(Finger.MIDDLE, 75) && (!sensor.isFingerBent(Finger.INDEX, 50)));
     }
 
