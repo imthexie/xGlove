@@ -104,21 +104,21 @@ class xGloveDispatcher {
     		mouse.doMouseLeftClick();
       	}
     	else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked()))
-	{ 
+    	{ 
     		if(Debug.DEBUG_MOUSE) System.out.println("Release");
     		mouse.doMouseLeftClickRelease();
-	}
-	else if(gesture.isMouseExitGesture())
+    	}
+    	else if(gesture.isMouseExitGesture())
     	{
     		moveMouse = !moveMouse;
     		threadSleep(50);
     	}
-	else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
-	{
-	    	dispatcherBlocked = true;
-	        mouse.mouseScroll();
-	        dispatcherBlocked = false;
-	}
+		else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
+		{
+		    	dispatcherBlocked = true;
+		        mouse.mouseScroll();
+		        dispatcherBlocked = false;
+		}
         else if(gesture.isSpacebarGesture())
     	{
         	dispatcherBlocked = true;
@@ -126,27 +126,27 @@ class xGloveDispatcher {
 	        dispatcherBlocked = false;
     	}
     	else if(gesture.upsideDown()) 
-	{
-    		dispatcherBlocked = true;
-	        keyboard.doMacLaunchpad(); 
-	        dispatcherBlocked = false;
-	}  
+		{
+	    		dispatcherBlocked = true;
+		        keyboard.doMacLaunchpad(); 
+		        dispatcherBlocked = false;
+		}  
     	else if(gesture.isLoadNextGesture()) 
-	{
-	     	dispatcherBlocked = true;
-	        keyboard.doLoadNext();
-	        dispatcherBlocked = false;
-	} 
+		{
+		     	dispatcherBlocked = true;
+		        keyboard.doLoadNext();
+		        dispatcherBlocked = false;
+		} 
     	else if (gesture.isLoadPreviousGesture()) 
-	{
-	        dispatcherBlocked = true;
-	        keyboard.doLoadPrevious();
-	        dispatcherBlocked = false;
-	}
-	else  
-	{
-	        dispatcherBlocked = false;
-	}	
+		{
+		        dispatcherBlocked = true;
+		        keyboard.doLoadPrevious();
+		        dispatcherBlocked = false;
+		}
+		else  
+		{
+		        dispatcherBlocked = false;
+		}	
     }
     
     public static xGloveSensor getSensor() 
