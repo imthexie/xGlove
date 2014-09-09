@@ -229,10 +229,10 @@ class xGloveMouse
 	while(!gesture.isScrollModeGesture())
     { 
 		int inclinationPercentage = gesture.getInclinationFourFingers();
-		if(inclinationPercentage < 38)         								// scroll up if fingers bent up
+		if(inclinationPercentage < 40)         								// scroll up if fingers bent up
 		{
 			inclinationPercentage = gesture.getInclinationFourFingers();  
-			mouseRobot.mouseWheel((int)((40 - inclinationPercentage) / 3));	// scroll up
+			mouseRobot.mouseWheel((int)((42 - inclinationPercentage) / 3));	// scroll up
 			mouseRobot.delay(40);
 		}   
 		else if(inclinationPercentage > 53)   								// scroll down if fingers bent down
