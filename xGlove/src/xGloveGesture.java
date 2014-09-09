@@ -29,12 +29,17 @@ class xGloveGesture
     {
         return !sensor.allFingersBent(50);
     }
-
+    
+    public boolean isStable()
+    {
+    	if((Math.abs(sensor.getOrientation().roll) < 35) && (Math.abs(sensor.getOrientation().pitch) < 35)) return true;
+    	return false;
+    }
 
     //Consider implementing this with a Timer instead. Or just make this event a non-delayed event
     public boolean upsideDown()
     {
-    	if(Math.abs(sensor.getOrientation().roll) > 170)
+    	if(Math.abs(sensor.getOrientation().roll) > 160)
         {
             /* This for loop is used to ensure that the glove is upside down */
             /* for at least .5 second -> 10 * 0.05 second                    */
@@ -140,12 +145,12 @@ class xGloveGesture
     
     public boolean isLoadNextGesture() 
     {
-        return sensor.getOrientation().pitch < -50;
+        return ((sensor.getOrientation().pitch < -50) && (Math.abs(sensor.getOrientation().roll) < 100));
     }
     
     public boolean isLoadPreviousGesture() 
     {
-        return sensor.getOrientation().pitch > 70;
+        return ((sensor.getOrientation().pitch >  70) && (Math.abs(sensor.getOrientation().roll) < 100));
     }
     
     public int getInclinationFourFingers() 
