@@ -25,6 +25,7 @@ class xGloveDispatcher {
     //Assorted jobs and events for the threads to do
     private mouseMoveEvent         mouseMoveEvent;
     private dispatcherEvent        dispatcherEvent;
+    private toggleDongleEvent	   toggleDongleEvent;
     
     //Thread Pool that takes care of the events 
     private ExecutorService threadPool;
@@ -60,6 +61,7 @@ class xGloveDispatcher {
         
         mouseMoveEvent         =      new mouseMoveEvent();
         dispatcherEvent        =      new dispatcherEvent();
+        toggleDongleEvent      =      new toggleDongleEvent();
     };
 
     //Called continuously to update sensor values
@@ -113,11 +115,16 @@ class xGloveDispatcher {
     		moveMouse = !moveMouse;
     		threadSleep(50);
     	}
+    	else if(!toggleDongleEvent.isExecuteQueued() && gesture.isToggleDongleGesture())
+    	{
+    		toggleDongleEvent.setExecuteQueued(); //Set boolean true to make sure this doesn't repeatedly get called
+    		threadPool.execute(toggleDongleEvent); //boolean is set false after network call is completed
+    	}
 		else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
 		{
-		    	dispatcherBlocked = true;
-		        mouse.mouseScroll();
-		        dispatcherBlocked = false;
+	    	dispatcherBlocked = true;
+	        mouse.mouseScroll();
+	        dispatcherBlocked = false;
 		}
         else if(gesture.isSpacebarGesture())
     	{
@@ -127,25 +134,25 @@ class xGloveDispatcher {
     	}
     	else if(gesture.upsideDown()) 
 		{
-	    		dispatcherBlocked = true;
-		        keyboard.doMacLaunchpad(); 
-		        dispatcherBlocked = false;
+    		dispatcherBlocked = true;
+	        keyboard.doMacLaunchpad(); 
+	        dispatcherBlocked = false;
 		}  
     	else if(gesture.isLoadNextGesture()) 
 		{
-		     	dispatcherBlocked = true;
-		        keyboard.doLoadNext();
-		        dispatcherBlocked = false;
+	     	dispatcherBlocked = true;
+	        keyboard.doLoadNext();
+	        dispatcherBlocked = false;
 		} 
     	else if (gesture.isLoadPreviousGesture()) 
 		{
-		        dispatcherBlocked = true;
-		        keyboard.doLoadPrevious();
-		        dispatcherBlocked = false;
+	        dispatcherBlocked = true;
+	        keyboard.doLoadPrevious();
+	        dispatcherBlocked = false;
 		}
 		else  
 		{
-		        dispatcherBlocked = false;
+	        dispatcherBlocked = false;
 		}	
     }
     
@@ -181,6 +188,35 @@ class xGloveDispatcher {
         	numMouseExecutes--;
             mouse.moveMouse();
         }
+    }
+    
+    //A Thread job for making network calls to dongle
+    private class toggleDongleEvent implements Runnable 
+    {  
+    	//allow one of these events at a time 
+    	private volatile boolean executeQueued;
+        public toggleDongleEvent() 
+        {
+        	executeQueued = false;
+        }
+
+        @Override
+        public void run() 
+        {
+        	//Call toggle on dongle
+        	executeQueued = false;
+        }
+        
+        public void setExecuteQueued() 
+        {
+        	executeQueued = true;
+        }
+        
+        public boolean isExecuteQueued() 
+        {
+        	return executeQueued;
+        }
+        
     }
 
     //Reset maxima minima values for dispatcher

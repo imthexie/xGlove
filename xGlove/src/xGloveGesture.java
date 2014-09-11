@@ -153,6 +153,12 @@ class xGloveGesture
         return ((sensor.getOrientation().pitch >  70) && (Math.abs(sensor.getOrientation().roll) < 100));
     }
     
+    //Bend only index finger
+    public boolean isToggleDongleGesture() {
+    	return sensor.isFingerBent(Finger.INDEX, 65) && !sensor.isFingerBent(Finger.THUMB, 30) && 
+    			!sensor.isFingerBent(Finger.MIDDLE, 30) && !sensor.isFingerBent(Finger.RING, 30) && !sensor.isFingerBent(Finger.PINKY, 30);
+    }
+    
     public int getInclinationFourFingers() 
     {
         return sensor.getInclinationFourFingers();
