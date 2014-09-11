@@ -144,7 +144,7 @@ class xGloveMouse
   /* Function: moveMouse
    * --------------------
    * This function uses the data from the 9-DOF chip to move the mouse cursor. 
-   * The function calls the readAxis function to turn the position of the 
+   * The function calls the getCursorPosition function to turn the position of the 
    * glove into a corresponding position of the mouse cursor on the screen. 
    */
   public void moveMouse()

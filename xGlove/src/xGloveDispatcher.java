@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,9 +25,8 @@ class xGloveDispatcher {
     private xGloveGesture      gesture;
     
     //Assorted jobs and events for the threads to do
-    private mouseMoveEvent         mouseMoveEvent;
-    private dispatcherEvent        dispatcherEvent;
-    private toggleDongleEvent	   toggleDongleEvent;
+    private MouseMoveEvent         mouseMoveEvent;
+    private DispatcherEvent        dispatcherEvent;
     
     //Thread Pool that takes care of the events 
     private ExecutorService threadPool;
@@ -38,6 +39,9 @@ class xGloveDispatcher {
     //Counts number of executions queued up
     private volatile int numExecutes;
     private volatile int numMouseExecutes;
+    
+    //Array of jobs to test and execute on each turn
+    private ArrayList<Job> jobArray;
     
     //Public methods
     public xGloveDispatcher() 
@@ -59,9 +63,11 @@ class xGloveDispatcher {
         mouse                  =      new xGloveMouse(); //Mouse must be constructed after sensor
         keyboard               =      new xGloveKeyboard();
         
-        mouseMoveEvent         =      new mouseMoveEvent();
-        dispatcherEvent        =      new dispatcherEvent();
-        toggleDongleEvent      =      new toggleDongleEvent();
+        mouseMoveEvent         =      new MouseMoveEvent();
+        dispatcherEvent        =      new DispatcherEvent();
+        
+        jobArray = new ArrayList<Job>();
+        initJobs();
     };
 
     //Called continuously to update sensor values
@@ -94,66 +100,14 @@ class xGloveDispatcher {
     {
     	if(Debug.MAIN_DEBUG) System.out.println("Dispatching Events");
     	
-    	/* Gestures */
-    	if(gesture.isDragMouseGesture(mouse.isCurrentlyClicked()))      // drag when thumb and index finger are stretched, and middle finger,										
-        {								      // ring finger and pinky are bent 
-    		if(Debug.DEBUG_MOUSE) System.out.println("Drag");
-    		mouse.doDragMouse();
-        }
-    	else if(gesture.isMouseClickGesture(mouse.isCurrentlyClicked()))
-      	{
-    		if(Debug.DEBUG_MOUSE) System.out.println("Click");
-    		mouse.doMouseLeftClick();
-      	}
-    	else if(gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked()))
-    	{ 
-    		if(Debug.DEBUG_MOUSE) System.out.println("Release");
-    		mouse.doMouseLeftClickRelease();
-    	}
-    	else if(gesture.isMouseExitGesture())
+    	for(Job job : jobArray) 
     	{
-    		moveMouse = !moveMouse;
-    		threadSleep(50);
+    		if(job.checkGesture())
+    		{
+    			job.execute();
+    			break;
+    		}
     	}
-    	else if(!toggleDongleEvent.isExecuteQueued() && gesture.isToggleDongleGesture())
-    	{
-    		toggleDongleEvent.setExecuteQueued(); //Set boolean true to make sure this doesn't repeatedly get called
-    		threadPool.execute(toggleDongleEvent); //boolean is set false after network call is completed
-    	}
-		else if(gesture.isScrollModeGesture()) //Blocking functions must block and unblock the dispatcher
-		{
-	    	dispatcherBlocked = true;
-	        mouse.mouseScroll();
-	        dispatcherBlocked = false;
-		}
-        else if(gesture.isSpacebarGesture())
-    	{
-        	dispatcherBlocked = true;
-    		keyboard.doSpacebar();
-	        dispatcherBlocked = false;
-    	}
-    	else if(gesture.upsideDown()) 
-		{
-    		dispatcherBlocked = true;
-	        keyboard.doMacLaunchpad(); 
-	        dispatcherBlocked = false;
-		}  
-    	else if(gesture.isLoadNextGesture()) 
-		{
-	     	dispatcherBlocked = true;
-	        keyboard.doLoadNext();
-	        dispatcherBlocked = false;
-		} 
-    	else if (gesture.isLoadPreviousGesture()) 
-		{
-	        dispatcherBlocked = true;
-	        keyboard.doLoadPrevious();
-	        dispatcherBlocked = false;
-		}
-		else  
-		{
-	        dispatcherBlocked = false;
-		}	
     }
     
     public static xGloveSensor getSensor() 
@@ -161,62 +115,264 @@ class xGloveDispatcher {
         return sensor; 
     }
     
+    private void initJobs() 
+    {
+    	//Mouse drag
+    	jobArray.add(new Job(false, false, false, 
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						mouse.doDragMouse();
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isDragMouseGesture(mouse.isCurrentlyClicked());
+					}
+    			}));
+    	
+    	//Mouse click
+    	jobArray.add(new Job(false, false, false,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						mouse.doMouseLeftClick();
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isMouseClickGesture(mouse.isCurrentlyClicked());
+					}
+    			}));
+    	
+    	//Mouse click release
+    	jobArray.add(new Job(false, false, false,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						mouse.doMouseLeftClickRelease();
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked());
+					}
+    			}));
+    	
+    	//Mouse exit
+    	jobArray.add(new Job(false, false, false,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						moveMouse = !moveMouse;
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isMouseExitGesture();
+					}
+    			}));
+    	
+    	//Toggle Dongle
+    	jobArray.add(new Job(true, true, false,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						//toggle the dongle
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isToggleDongleGesture();
+					}
+    			}));
+    	
+    	/*Blocking jobs*/
+    	
+    	//Scroll Mode
+    	jobArray.add(new Job(false, false, true,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						mouse.mouseScroll();
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isScrollModeGesture();
+					}
+    			}));
+    	
+    	//Spacebar
+    	jobArray.add(new Job(false, false, true,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+						keyboard.doSpacebar();
+					}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isSpacebarGesture();
+					}
+    			}));
+    	
+    	//Upside down
+    	jobArray.add(new Job(false, false, true,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+    					keyboard.doMacLaunchpad();
+    				}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.upsideDown();
+					}
+    			}));
+    	
+    	//Load next
+    	jobArray.add(new Job(false, false, true,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+    					keyboard.doLoadNext();
+    				}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isLoadNextGesture();
+					}
+    			}));
+    	
+    	//Load Previous
+    	jobArray.add(new Job(false, false, true,
+    			new Runnable() {
+    				@Override 
+    				public void run() {
+    					keyboard.doLoadPrevious();
+    				}
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception {
+						return gesture.isLoadPreviousGesture();
+					}
+    			}));
+    }
+    
+    //When adding to the job array, make sure each specification in the constructor is correct for the correct behavior.
+    private class Job 
+    {
+    	private boolean isConcurrent, isLinear, isBlocking;
+    	private Runnable event;
+    	private LinearRunnableWrapper linearEventWrapper;
+    	private Callable<Boolean> gestureCheck;
+    	private volatile boolean isExecuting;
+    	
+    	public Job(boolean isConcurrent, boolean isLinear, boolean isBlocking, Runnable event, Callable<Boolean> gestureCheck) 
+    	{
+    		this.isConcurrent = isConcurrent;
+    		this.isLinear = isLinear;
+    		this.isBlocking = isBlocking;
+    		
+    		//The event to fire upon checking for the right gesture
+    		this.event = event;
+    		//If a concurrent event should be fired one at a time, wrap it in this class
+    		if(isLinear) 
+    		{
+    			linearEventWrapper = new LinearRunnableWrapper(event);
+    		}
+    		
+    		//Function that checks for gesture
+    		this.gestureCheck  = gestureCheck;
+    		isExecuting = false;
+    	}
+    	
+    	public boolean checkGesture() 
+    	{
+    		if(isLinear && isExecuting) return false;
+    		try {
+    			boolean returnValue = gestureCheck.call().booleanValue();
+    			if(returnValue && isLinear) isExecuting = true;
+    			if(returnValue && isBlocking) dispatcherBlocked = true;
+    			return returnValue;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return false;
+    	}
+    	
+    	public void execute() 
+    	{
+    		if(isLinear && isConcurrent) 
+    		{
+    			threadPool.execute(linearEventWrapper); //wrapper flips on/off isExecuting when executed
+    		}
+    		else if(isConcurrent) 
+			{
+    			threadPool.execute(event);
+			} 
+    		else 
+    		{
+    			event.run();
+    			if(isLinear) isExecuting = false; //this makes it ok for you to specify that non-concurrent functions are linear, though not necessary
+    			if(isBlocking) dispatcherBlocked = false;
+    		}
+    	}
+    	
+    	private class LinearRunnableWrapper implements Runnable
+    	{
+    		Runnable runnable;
+    		
+    		public LinearRunnableWrapper(Runnable runnable) 
+    		{
+    			this.runnable = runnable;
+    		}
+
+			@Override
+			public void run() {
+				runnable.run();
+				isExecuting = false;
+			}
+    	}
+    }
     
     /**Thread jobs**/
     
-    private class dispatcherEvent implements Runnable 
+    private class DispatcherEvent implements Runnable 
     {
-    	public dispatcherEvent() {}
+    	public DispatcherEvent() {}
     	@Override 
     	public void run() 
         {
         	//Decrement number of executions queued for dispatcher
     		numExecutes--;
-    		dispatchEvents();
+    		if(!dispatcherBlocked) dispatchEvents();
     	}
     }
     
     //A Thread job for moving the mouse
-    private class mouseMoveEvent implements Runnable 
+    private class MouseMoveEvent implements Runnable 
     {  
-        public mouseMoveEvent() {}
+        public MouseMoveEvent() {}
 
         @Override
         public void run() 
         {
         	//Decrement number of executions queued for mouse
         	numMouseExecutes--;
-            mouse.moveMouse();
+            if(moveMouse && !dispatcherBlocked) mouse.moveMouse();
         }
-    }
-    
-    //A Thread job for making network calls to dongle
-    private class toggleDongleEvent implements Runnable 
-    {  
-    	//allow one of these events at a time 
-    	private volatile boolean executeQueued;
-        public toggleDongleEvent() 
-        {
-        	executeQueued = false;
-        }
-
-        @Override
-        public void run() 
-        {
-        	//Call toggle on dongle
-        	executeQueued = false;
-        }
-        
-        public void setExecuteQueued() 
-        {
-        	executeQueued = true;
-        }
-        
-        public boolean isExecuteQueued() 
-        {
-        	return executeQueued;
-        }
-        
     }
 
     //Reset maxima minima values for dispatcher
