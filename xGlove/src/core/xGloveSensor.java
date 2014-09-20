@@ -1,3 +1,4 @@
+package core;
 class xGloveSensor 
 {
 	//Used in debug logs
