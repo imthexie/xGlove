@@ -1,3 +1,4 @@
+package core;
 class xGloveGesture 
 {
 	//Used in debug logs

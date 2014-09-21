@@ -1,3 +1,4 @@
+package core;
 
 public class Debug {
 	//Turn on and off different debug logs

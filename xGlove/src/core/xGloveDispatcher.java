@@ -1,7 +1,10 @@
+package core;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import dongle.DongleController;
 
 /**
 * Event Dispatcher that is meant to be run inside a firmware 
@@ -23,7 +26,7 @@ class xGloveDispatcher {
     private xGloveMouse        mouse;
     private xGloveKeyboard     keyboard;
     private xGloveGesture      gesture;
-    
+    private DongleController   dongleController;
     //Assorted jobs and events for the threads to do
     private MouseMoveEvent         mouseMoveEvent;
     private DispatcherEvent        dispatcherEvent;
@@ -62,6 +65,7 @@ class xGloveDispatcher {
         gesture                =      new xGloveGesture();
         mouse                  =      new xGloveMouse(); //Mouse must be constructed after sensor
         keyboard               =      new xGloveKeyboard();
+        dongleController	   =      new DongleController();
         
         mouseMoveEvent         =      new MouseMoveEvent();
         dispatcherEvent        =      new DispatcherEvent();
@@ -121,11 +125,13 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, false, 
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
 						mouse.doDragMouse();
 					}
     			}, 
-    			new Callable<Boolean>() {
+    			new Callable<Boolean>() 
+    			{
 					@Override
 					public Boolean call() throws Exception {
 						return gesture.isDragMouseGesture(mouse.isCurrentlyClicked());
@@ -136,13 +142,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, false,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
 						mouse.doMouseLeftClick();
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isMouseClickGesture(mouse.isCurrentlyClicked());
 					}
     			}));
@@ -151,13 +159,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, false,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
 						mouse.doMouseLeftClickRelease();
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked());
 					}
     			}));
@@ -166,13 +176,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, false,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
 						moveMouse = !moveMouse;
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isMouseExitGesture();
 					}
     			}));
@@ -181,13 +193,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(true, true, false,
     			new Runnable() {
     				@Override 
-    				public void run() {
-						//toggle the dongle
+    				public void run() 
+    				{
+						dongleController.toggle();
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isToggleDongleGesture();
 					}
     			}));
@@ -198,13 +212,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
 						mouse.mouseScroll();
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isScrollModeGesture();
 					}
     			}));
@@ -213,13 +229,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
 						keyboard.doSpacebar();
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isSpacebarGesture();
 					}
     			}));
@@ -228,13 +246,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
     					keyboard.doMacLaunchpad();
     				}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.upsideDown();
 					}
     			}));
@@ -243,13 +263,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
     					keyboard.doLoadNext();
     				}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isLoadNextGesture();
 					}
     			}));
@@ -258,13 +280,15 @@ class xGloveDispatcher {
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
-    				public void run() {
+    				public void run() 
+    				{
     					keyboard.doLoadPrevious();
     				}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception {
+					public Boolean call() throws Exception 
+					{
 						return gesture.isLoadPreviousGesture();
 					}
     			}));
