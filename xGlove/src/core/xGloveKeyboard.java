@@ -110,10 +110,10 @@ class xGloveKeyboard
                 
                 // Load previous page in browsers
                 //Web shortcuts not consistent throughout browsers and OS's
-                keyboardRobot.keyPress(KeyEvent.VK_META);
-                keyboardRobot.keyPress(KeyEvent.VK_OPEN_BRACKET);
-                keyboardRobot.keyRelease(KeyEvent.VK_META);
-                keyboardRobot.keyRelease(KeyEvent.VK_OPEN_BRACKET);  
+//                keyboardRobot.keyPress(KeyEvent.VK_META);
+//                keyboardRobot.keyPress(KeyEvent.VK_OPEN_BRACKET);
+//                keyboardRobot.keyRelease(KeyEvent.VK_META);
+//                keyboardRobot.keyRelease(KeyEvent.VK_OPEN_BRACKET);  
                 
                 // Thread.sleep between iterations of this function
                 xGloveDispatcher.threadSleep(1500);   

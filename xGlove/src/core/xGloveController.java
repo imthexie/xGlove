@@ -1,6 +1,13 @@
 package core;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import processing.core.*;
 import processing.serial.*;
@@ -16,7 +23,7 @@ public class xGloveController extends PApplet implements KeyListener
 	
 	public static void main(String args[]) 
 	{
-	    PApplet.main(new String[] {"xGloveController" });
+	    PApplet.main(new String[] {"core.xGloveController" });
 	}
 	
 	Serial myPort = null;   // Create object from Serial class
@@ -48,7 +55,7 @@ public class xGloveController extends PApplet implements KeyListener
 				System.out.println("Clean up Resources."); 
 		    	if(myPort != null) {
 		    		myPort.clear();
-		    		myPort.write('N'); //Reset bluetooth to send resets
+		    		attemptToRequestReset(); //Reset bluetooth to send resets
 		    		
 		    		//TODO: check if a delay is needed to make sure bluetooth reads the reset request
 					cleanUpPort();	
@@ -88,7 +95,7 @@ public class xGloveController extends PApplet implements KeyListener
 				cleanUpPort();
 				myPort = new Serial(this, Serial.list()[portIndex], 115200);
 				myPort.clear();
-				myPort.write('N'); // request reset
+				attemptToRequestReset(); // request reset
 
 				if(checkPort()) break;
 		 	} 
@@ -140,7 +147,7 @@ public class xGloveController extends PApplet implements KeyListener
 		{
 			try 
 			{
-				if(myPort != null) myPort.write('N'); //request reset
+				if(myPort != null) attemptToRequestReset(); //request reset
 			} 
 			catch (Exception e) {
 				myPort = null;
@@ -182,7 +189,7 @@ public class xGloveController extends PApplet implements KeyListener
 	      else if(!"v1".equals(data[0])) 
 	      {
 	    	  myPort.clear();
-	    	  myPort.write('N'); //request reset
+	    	  attemptToRequestReset(); //request reset
 	    	  throw new Exception(TAG + "Data header was not recognized");
 	      }
 	      
@@ -233,7 +240,8 @@ public class xGloveController extends PApplet implements KeyListener
 		public void run() 
 		{
 			while (running) 
-			{				
+			{	
+				if(Debug.MAIN_DEBUG) println("isConnected: " + isConnected);
 				if(!isConnected) 
 				{
 					connectToPort();
@@ -269,6 +277,33 @@ public class xGloveController extends PApplet implements KeyListener
 			running = false;  // Setting running to false ends the loop in run()
 			interrupt();
 		}
+	}
+	
+	private boolean attemptToRequestReset() {
+		ExecutorService executor = Executors.newCachedThreadPool();
+		Callable<Boolean> resetTask = new Callable<Boolean>() {
+		   public Boolean call() {
+		      myPort.write('N'); //request reset
+		      return new Boolean(true);
+		   }
+		};
+		Future<Boolean> future = executor.submit(resetTask);
+		try {
+		   future.get(1, TimeUnit.SECONDS); 
+		} catch (TimeoutException ex) {
+			future.cancel(true); // may or may not desire this
+			return false;
+		   // handle the timeout
+		} catch (InterruptedException e) {
+			future.cancel(true); // may or may not desire this
+			return false;
+		   // handle the interrupts
+		} catch (ExecutionException e) {
+			future.cancel(true); // may or may not desire this
+			return false;
+		   // handle other exceptions
+		}
+		return true;
 	}
 
 	//Must override these to implement KeyListener

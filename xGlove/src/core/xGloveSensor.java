@@ -42,19 +42,19 @@ class xGloveSensor
 
 	public xGloveSensor() 
 	{
-		thumbBent 		   =  85;
-		indexBent 		   =  75;
-		middleBent         =  80;
-	    ringBent           =  120;
-	    pinkyBent          =  50;
+		thumbBent 		   =  0; //updated 9/23
+		indexBent 		   =  680; //updated 9/23
+		middleBent         =  370; //updated 9/23
+	    ringBent           =  840; //updated 9/23
+	    pinkyBent          =  0;
 	    fourFingersBent    =  indexBent + middleBent + ringBent + pinkyBent;
 	    allFingersBent     =  thumbBent + indexBent + middleBent + ringBent + pinkyBent; 
 
-	    thumbStretch	   =  185;
-	    indexStretch 	   =  230;
-	    middleStretch	   =  280;
-	    ringStretch	 	   =  250;
-	    pinkyStretch 	   =  165;
+	    thumbStretch	   =  0; //updated 9/23
+	    indexStretch 	   =  860; //updated 9/23
+	    middleStretch	   =  580; //updated 9/23
+	    ringStretch	 	   =  1000; //updated 9/23
+	    pinkyStretch 	   =  0; //updated 9/23
 	    fourFingersStretch =  indexStretch + middleStretch + ringStretch + pinkyStretch;
 	    allFingersStretch  =  fourFingersStretch + thumbStretch;
 	    
@@ -89,7 +89,7 @@ class xGloveSensor
 	    if(Debug.MAIN_DEBUG) System.out.println(TAG + " updateOrientation(): " + "Roll: " + orientation.roll 
 	    											+ " Pitch: " + orientation.pitch + " Heading: " + orientation.heading);
   	}
-		
+	
 	public boolean isFingerBent(Finger finger, double percentageBent) 
 	{
 		switch(finger)
@@ -103,29 +103,15 @@ class xGloveSensor
 		}
 	}
 	
-	public boolean fourFingersBent(double percentageBent)
-	{
-		return ((indexVal + middleVal + ringVal + pinkyVal) <  fourFingersStretch - (percentageBent/100.0) * 
-				 fourFingersRange );
-	}
-	
 	public boolean allFingersBent(double percentageBent)
 	{
-		boolean test = false;
-		if(test)
-		{
-			System.out.println("bent value  " + (thumbVal + indexVal + middleVal + ringVal + pinkyVal));
-			System.out.println("set value " + (allFingersStretch  - ((double)percentageBent/100.0) * 
-								(double)allFingersRange));
-		}
-		return ((thumbVal + indexVal + middleVal + ringVal + pinkyVal)  <  allFingersStretch  - ((double)percentageBent/100.0) * 
-				 (double)allFingersRange);
+		return isFingerBent(Finger.INDEX, percentageBent) && isFingerBent(Finger.MIDDLE, percentageBent)
+					&& isFingerBent(Finger.RING, percentageBent);
 	}
 	
 	public boolean allFingersSpread() 
 	{
-		boolean allSpread = !fourFingersBent(62);
-		//System.out.println(TAG + " allFingersSpread(): " + allSpread); 
+		boolean allSpread = !allFingersBent(62);
 		if(Debug.MAIN_DEBUG) System.out.println(TAG + " allFingersSpread(): Is Bent: " + allSpread); 
 		return allSpread;
 	}
@@ -145,7 +131,7 @@ class xGloveSensor
 	
 	public int getInclinationFourFingers()
 	{
-		return (100 *  (fourFingersStretch  - (indexVal + middleVal + ringVal + pinkyVal)))  /  fourFingersRange  ;
+		return (100 *  (fourFingersStretch  - (indexVal + middleVal + ringVal + pinkyVal)))  /  fourFingersRange;
 	}
 	
     public int getFlexValue(Finger finger) 
