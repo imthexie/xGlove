@@ -109,6 +109,7 @@ class xGloveDispatcher {
     		if(job.checkGesture())
     		{
     			job.execute();
+    			if(job.isConcurrent) Thread.yield();
     			break;
     		}
     	}

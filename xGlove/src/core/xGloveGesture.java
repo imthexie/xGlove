@@ -85,7 +85,7 @@ class xGloveGesture
     	}
     	else 
     	{
-    		currentlyClicked = sensor.fourFingersBent(65) && Math.abs(sensor.getOrientation().pitch) < 35;
+    		currentlyClicked = sensor.allFingersBent(65) && Math.abs(sensor.getOrientation().pitch) < 35;
     	}
     	return currentlyClicked; 
     }
@@ -117,7 +117,7 @@ class xGloveGesture
     
     public boolean isScrollModeGesture() 
     {
-        return sensor.isFingerBent(Finger.RING, 83) && !(sensor.isFingerBent(Finger.MIDDLE, 53)) && !(sensor.isFingerBent(Finger.INDEX, 53));
+        return sensor.isFingerBent(Finger.RING, 60) && !(sensor.isFingerBent(Finger.MIDDLE, 53)) && !(sensor.isFingerBent(Finger.INDEX, 53));
     }
     
     public boolean isReleaseScrollModeGesture() 
@@ -156,8 +156,8 @@ class xGloveGesture
     
     //Bend only index finger
     public boolean isToggleDongleGesture() {
-    	return sensor.isFingerBent(Finger.INDEX, 65) && !sensor.isFingerBent(Finger.THUMB, 30) && 
-    			!sensor.isFingerBent(Finger.MIDDLE, 30) && !sensor.isFingerBent(Finger.RING, 30) && !sensor.isFingerBent(Finger.PINKY, 30);
+    	return sensor.isFingerBent(Finger.INDEX, 60) && 
+    			!sensor.isFingerBent(Finger.MIDDLE, 50) && !sensor.isFingerBent(Finger.RING, 50);
     }
     
     public int getInclinationFourFingers() 
