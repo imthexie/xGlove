@@ -23,20 +23,22 @@ static sensors_event_t mag_event;
 static sensors_vec_t   orientation;
 
  /* Analog Input Pins corresponding to each finger */
-static const int thumbPin                   =   A1;
 static const int indexFingerPin             =   A2; 
-static const int middleFingerPin            =   A3;
-static const int ringFingerPin              =   A4;
-static const int pinkyPin                   =   A5;
+static const int middleFingerPin            =   A1;
+static const int ringFingerPin              =   A0;
+
+static const int pinkyPin                   =   A5;//unused
+static const int thumbPin                   =   A1;//unused
+
 
 /* These global variables indicate the current analogRead values
  * of each fingers, four fingers and all fingers.
  */
-static int thumbCurrentValue                =   0;
-static int indexFingerCurrentValue          =   0;
+static int thumbCurrentValue                =   0; //unused
+static int indexFingerCurrentValue          =   0; 
 static int middleFingerCurrentValue         =   0;
 static int ringFingerCurrentValue           =   0;
-static int pinkyCurrentValue                =   0;
+static int pinkyCurrentValue                =   0; //unused
 
 //Mouse X, Y calibration values
 int minima[]                                =   {0, -40};          // actual analogRead minima for {x, y}
@@ -143,11 +145,11 @@ void readLocationSensors(boolean setMaxima)
 void readFlexSensors() 
 {
     //Update finger flex sensor values
-    thumbCurrentValue           =   analogRead(thumbPin);
+    thumbCurrentValue           =   -1; //updated 9/23
     indexFingerCurrentValue     =   analogRead(indexFingerPin);
     middleFingerCurrentValue    =   analogRead(middleFingerPin);
     ringFingerCurrentValue      =   analogRead(ringFingerPin);
-    pinkyCurrentValue           =   analogRead(pinkyPin);
+    pinkyCurrentValue           =   -1; //updated 9/23
 }
 
 /* Function: initSensors
