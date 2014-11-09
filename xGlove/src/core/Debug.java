@@ -5,5 +5,6 @@ public class Debug {
 	
 	public static boolean MAIN_DEBUG = false;
 	public static boolean DEBUG_MOUSE = false;
+	public static boolean DEBUG_SENSORS = true;
 }
  

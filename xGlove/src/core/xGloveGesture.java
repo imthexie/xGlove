@@ -100,7 +100,8 @@ class xGloveGesture
     	{
     		currentlyClicked = (sensor.isFingerBent(Finger.RING, 72) && sensor.isFingerBent(Finger.MIDDLE, 75) && (!sensor.isFingerBent(Finger.INDEX, 50)));
     	}
-    	
+		
+
     	if(Debug.DEBUG_MOUSE)
     	{
     		System.out.println("ring bent "+ (sensor.isFingerBent(Finger.RING, 72)));
