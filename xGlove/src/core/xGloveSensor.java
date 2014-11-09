@@ -43,16 +43,16 @@ class xGloveSensor
 	public xGloveSensor() 
 	{
 		thumbBent 		   =  0; //updated 9/23
-		indexBent 		   =  680; //updated 9/23
-		middleBent         =  370; //updated 9/23
-	    ringBent           =  840; //updated 9/23
+		indexBent 		   =  670; //updated 9/23
+		middleBent         =  350; //updated 9/23
+	    ringBent           =  830; //updated 9/23
 	    pinkyBent          =  0;
 	    fourFingersBent    =  indexBent + middleBent + ringBent + pinkyBent;
 	    allFingersBent     =  thumbBent + indexBent + middleBent + ringBent + pinkyBent; 
 
 	    thumbStretch	   =  0; //updated 9/23
-	    indexStretch 	   =  860; //updated 9/23
-	    middleStretch	   =  580; //updated 9/23
+	    indexStretch 	   =  820; //updated 9/23
+	    middleStretch	   =  610; //updated 9/23
 	    ringStretch	 	   =  1000; //updated 9/23
 	    pinkyStretch 	   =  0; //updated 9/23
 	    fourFingersStretch =  indexStretch + middleStretch + ringStretch + pinkyStretch;
@@ -76,7 +76,7 @@ class xGloveSensor
 		this.middleVal = middleVal;
 		this.ringVal = ringVal;
 		this.pinkyVal = pinkyVal;
-		if(Debug.MAIN_DEBUG) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
+		if(Debug.DEBUG_SENSORS) System.out.println(TAG + " updateFlexSensors(): " + "Thumb: " + this.thumbVal 
 				+ " Index: " + this.indexVal + " Middle: " + this.middleVal + " Ring: " + this.ringVal + " Pinky: " + this.pinkyVal);
 	}
 	
@@ -111,7 +111,7 @@ class xGloveSensor
 	
 	public boolean allFingersSpread() 
 	{
-		boolean allSpread = !allFingersBent(62);
+		boolean allSpread = !allFingersBent(50);
 		if(Debug.MAIN_DEBUG) System.out.println(TAG + " allFingersSpread(): Is Bent: " + allSpread); 
 		return allSpread;
 	}

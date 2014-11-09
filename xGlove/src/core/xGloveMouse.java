@@ -122,7 +122,8 @@ class xGloveMouse
 	}
 	
 	public void doMouseLeftClick() 
-	{    
+	{   
+		if(currentlyClicked) return;
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
 		xGloveDispatcher.threadSleep(20);
@@ -131,6 +132,7 @@ class xGloveMouse
 	
 	public void doDragMouse()
 	{
+		System.out.println("drag");
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click
 		xGloveDispatcher.threadSleep(20);
 		currentlyClicked = false;                         // there is no left click 

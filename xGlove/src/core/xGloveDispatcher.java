@@ -113,6 +113,12 @@ class xGloveDispatcher {
     			break;
     		}
     	}
+    	Job job = jobArray.get(0);
+    	if(job.checkGesture())
+    		{
+    			job.execute();
+    			if(job.isConcurrent) Thread.yield();
+    		}
     }
     
     public static xGloveSensor getSensor() 
@@ -145,6 +151,7 @@ class xGloveDispatcher {
     				@Override 
     				public void run() 
     				{
+    					if(Debug.DEBUG_SENSORS) System.out.println("============Mouse Click=========== currentlyClicked: " + mouse.isCurrentlyClicked());
 						mouse.doMouseLeftClick();
 					}
     			}, 
@@ -162,6 +169,8 @@ class xGloveDispatcher {
     				@Override 
     				public void run() 
     				{
+    					if(Debug.DEBUG_SENSORS) System.out.println("============Mouse Release=========== currentlyClicked: " + mouse.isCurrentlyClicked());
+    					
 						mouse.doMouseLeftClickRelease();
 					}
     			}, 
