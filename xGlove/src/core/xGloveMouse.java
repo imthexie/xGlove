@@ -14,15 +14,15 @@ class xGloveMouse
 	
 	xGloveGesture gesture;
 	
-	Dimension screen; 					//Computer screen data
+	Dimension screen; 					       //Computer screen data
 	
 	static int range       =  48;              // output range of X or Y movement
-	static int threshold   =  1;		        // resting threshold  originally -> /10
+	static int threshold   =  1;		       // resting threshold  originally -> /10
 	static int center      =  range / 2 ;      // resting position value
-	int minima[]    =  {0,  -40 };      // actual analogRead minima for {x, y}
-	int maxima[]    =  {0,   40 };      // actual analogRead maxima for {x, y}
+	int minima[]    =  {0,  -40 };             // actual analogRead minima for {x, y}
+	int maxima[]    =  {0,   40 };             // actual analogRead maxima for {x, y}
 	
-	//TODO: Test this, and evaluate need to use AtomicInteger
+	//TODO: Test this, and evaluate need to use AtomicInteger           
 	int x, y; //coordinates of mouse
 	
 	private volatile boolean currentlyClicked;
@@ -126,6 +126,9 @@ class xGloveMouse
 		if(currentlyClicked) return;
 		mouseRobot.mousePress(InputEvent.BUTTON1_MASK);   // left click 
 		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
+		
+		currentlyClicked = true;
+		
 		xGloveDispatcher.threadSleep(20);
 		if(Debug.DEBUG_MOUSE) System.out.println("There should be a click.");
 	}  
@@ -140,7 +143,7 @@ class xGloveMouse
 	
 	public void doMouseLeftClickRelease() 
 	{
-		mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
+		//mouseRobot.mouseRelease(InputEvent.BUTTON1_MASK); // release click
 		currentlyClicked = false;                         // there is no left click 
 	}
 	
@@ -224,18 +227,18 @@ class xGloveMouse
 	/* delay until user stretches ring finger again */
     while(!gesture.isReleaseScrollModeGesture())
     {
-    	xGloveDispatcher.threadSleep(50);
+    	xGloveDispatcher.threadSleep(10);
     }
-          
+    
     /* while loop will exit when ring finger is bent much more than middle finger */
     
 	while(!gesture.isScrollModeGesture())
     { 
 		int inclinationPercentage = gesture.getInclinationFourFingers();
-		if(inclinationPercentage < 40)         								// scroll up if fingers bent up
+		if(inclinationPercentage < 36)         								// scroll up if fingers bent up
 		{
 			inclinationPercentage = gesture.getInclinationFourFingers();  
-			mouseRobot.mouseWheel((int)((42 - inclinationPercentage) / 3));	// scroll up
+			mouseRobot.mouseWheel((int)((37 - inclinationPercentage) / 3));	// scroll up
 			mouseRobot.delay(40);
 		}   
 		else if(inclinationPercentage > 53)   								// scroll down if fingers bent down
@@ -249,7 +252,7 @@ class xGloveMouse
 	/* delay until user stretches ring finger again */
 	while(!gesture.isReleaseScrollModeGesture()) 
 	{
-		  xGloveDispatcher.threadSleep(20);
+		  xGloveDispatcher.threadSleep(10);
     }
   }
   

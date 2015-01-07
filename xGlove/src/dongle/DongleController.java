@@ -26,7 +26,19 @@ public class DongleController
 		}
 	}
 	
-	public void toggle() {		
+	public void toggle() {	
+		
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		System.out.println("test test test");
+		
 		//Make request
 		Response response = null;
 		if(toggleUrl != null) 
@@ -36,5 +48,5 @@ public class DongleController
 		if(response != null) 
 			System.out.println(response.toString());
 	}
-
+	
 }

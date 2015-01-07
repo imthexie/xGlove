@@ -52,7 +52,7 @@ public class xGloveController extends PApplet implements KeyListener
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		    @Override
 		    public void run() {
-				System.out.println("Clean up Resources."); 
+				System.out.println("Clean up Resources.");
 		    	if(myPort != null) {
 		    		myPort.clear();
 		    		attemptToRequestReset(); //Reset bluetooth to send resets

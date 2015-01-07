@@ -2,13 +2,13 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/commons-lang3-3.1.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/gson-2.2.4.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/guava-15.0.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/jssc.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/core.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/okhttp-1.2.1-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/smartconfiglib.jar"/>
-	<classpathentry kind="lib" path="D:/xGlove/Libraries/serial.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/guava-15.0.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/jssc.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/core.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/okhttp-1.2.1-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/smartconfiglib.jar"/>
+	<classpathentry kind="lib" path="/Users/teundeplanque/Documents/xGlove/Libraries/serial.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -90,11 +90,11 @@ class xGloveDispatcher {
         	numExecutes++;
         	dispatcherThread.execute(dispatcherEvent);
         }
-        
+              
         if(moveMouse && !dispatcherBlocked && numMouseExecutes < 3 && gesture.isStable()) 
         {
         	numMouseExecutes++;
-        	/* Move mouse continuously when dispatcher is not blocked*/
+        	/* Move mouse continuously when dispatcher is not blocked */
         	mouseThread.execute(mouseMoveEvent);
         }
     }
@@ -128,13 +128,14 @@ class xGloveDispatcher {
     
     private void initJobs() 
     {
-    	//Mouse drag
+    	//Mouse drag   
+    	/*
     	jobArray.add(new Job(false, false, false, 
     			new Runnable() {
     				@Override 
     				public void run() 
     				{
-						mouse.doDragMouse();
+						//mouse.doDragMouse();
 					}
     			}, 
     			new Callable<Boolean>() 
@@ -144,44 +145,43 @@ class xGloveDispatcher {
 						return gesture.isDragMouseGesture(mouse.isCurrentlyClicked());
 					}
     			}));
-    	
-    	//Mouse click
+    	*/
+    	// Mouse click
     	jobArray.add(new Job(false, false, false,
     			new Runnable() {
     				@Override 
     				public void run() 
     				{
     					if(Debug.DEBUG_SENSORS) System.out.println("============Mouse Click=========== currentlyClicked: " + mouse.isCurrentlyClicked());
-						mouse.doMouseLeftClick();
-					}
-    			}, 
+    					mouse.doMouseLeftClick();    				
+					}  
+    			},     
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception 
-					{
+					public Boolean call() throws Exception  
+					{ 
 						return gesture.isMouseClickGesture(mouse.isCurrentlyClicked());
-					}
-    			}));
-    	
-    	//Mouse click release
-    	jobArray.add(new Job(false, false, false,
-    			new Runnable() {
-    				@Override 
-    				public void run() 
-    				{
-    					if(Debug.DEBUG_SENSORS) System.out.println("============Mouse Release=========== currentlyClicked: " + mouse.isCurrentlyClicked());
-    					
+					} 
+    			}));     
+        
+    	//Mouse click release  
+    	jobArray.add(new Job(false, false, false,    
+    			new Runnable() {  
+    				@Override  
+    				public void run()   
+    				{ 
+    					if(Debug.DEBUG_SENSORS) System.out.println("============Mouse Release=========== currentlyClicked: " + mouse.isCurrentlyClicked());				
 						mouse.doMouseLeftClickRelease();
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
-					public Boolean call() throws Exception 
+					public Boolean call() throws Exception  
 					{
 						return gesture.isMouseReleaseGesture(mouse.isCurrentlyClicked());
 					}
     			}));
-    	
+    	/*
     	//Mouse exit
     	jobArray.add(new Job(false, false, false,
     			new Runnable() {
@@ -198,27 +198,35 @@ class xGloveDispatcher {
 						return gesture.isMouseExitGesture();
 					}
     			}));
-    	
+    		 
     	//Toggle Dongle
     	jobArray.add(new Job(true, true, false,
     			new Runnable() {
     				@Override 
     				public void run() 
     				{
-						dongleController.toggle();
+    					System.out.println("test test test");
+    					System.out.println("test test test");
+    					System.out.println("test test test");
+    					System.out.println("test test test");
+    					System.out.println("test test test");
+    					dongleController.toggle();
+						while(!gesture.isSpacebarReleaseGesture());
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
 					public Boolean call() throws Exception 
 					{
-						return gesture.isToggleDongleGesture();
+						return gesture.isSpacebarGesture();
+						//return gesture.isToggleDongleGesture();
 					}
     			}));
     	
-    	/*Blocking jobs*/
-    	
+    	// Blocking jobs
+    	*/
     	//Scroll Mode
+    	
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
@@ -234,14 +242,17 @@ class xGloveDispatcher {
 						return gesture.isScrollModeGesture();
 					}
     			}));
+    		 
     	
-    	//Spacebar
+    	//Spacebar  
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
-    				public void run() 
+    				public void run()  
     				{
+    				    //dongleController.toggle();
 						keyboard.doSpacebar();
+						//while(!gesture.isSpacebarReleaseGesture());   
 					}
     			}, 
     			new Callable<Boolean>() {
@@ -250,7 +261,7 @@ class xGloveDispatcher {
 					{
 						return gesture.isSpacebarGesture();
 					}
-    			}));
+    			}));  
     	
     	//Upside down
     	jobArray.add(new Job(false, false, true,
@@ -259,7 +270,7 @@ class xGloveDispatcher {
     				public void run() 
     				{
     					keyboard.doMacLaunchpad();
-    				}
+    				}    
     			}, 
     			new Callable<Boolean>() {
 					@Override
@@ -270,6 +281,7 @@ class xGloveDispatcher {
     			}));
     	
     	//Load next
+    	
     	jobArray.add(new Job(false, false, true,
     			new Runnable() {
     				@Override 
@@ -282,7 +294,7 @@ class xGloveDispatcher {
 					@Override
 					public Boolean call() throws Exception 
 					{
-						return gesture.isLoadNextGesture();
+						return (gesture.isLoadNextGesture() && !(Math.abs(sensor.getOrientation().roll) > 160));
 					}
     			}));
     	
@@ -291,17 +303,18 @@ class xGloveDispatcher {
     			new Runnable() {
     				@Override 
     				public void run() 
-    				{
+    				{ 
     					keyboard.doLoadPrevious();
-    				}
+    				} 
     			}, 
     			new Callable<Boolean>() {
 					@Override
 					public Boolean call() throws Exception 
 					{
-						return gesture.isLoadPreviousGesture();
+						return (gesture.isLoadPreviousGesture() && !(Math.abs(sensor.getOrientation().roll) > 160));
 					}
-    			}));
+    			})); 
+    	
     }
     
     //When adding to the job array, make sure each specification in the constructor is correct for the correct behavior.

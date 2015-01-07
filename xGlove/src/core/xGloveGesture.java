@@ -10,33 +10,38 @@ class xGloveGesture
     {
         this.sensor = xGloveDispatcher.getSensor();
     }
-
+    
     public Orientation getOrientation() 
-    {
-        return sensor.getOrientation();
-    }
-
-    public boolean fist() 
-    {
-        return sensor.allFingersBent(66);
-    }
-
-    public boolean fingersBent() 
-    {
-        return sensor.allFingersBent(50);
-    }
-
-    public boolean fingersSpread() 
-    {
-        return !sensor.allFingersBent(50);
+    { 
+        return sensor.getOrientation(); 
     }
     
-    public boolean isStable()
+    public boolean fist()  
+    {
+    	return sensor.allFingersBent(84);
+    }
+    
+    public boolean fistLight()  
+    {
+    	return sensor.allFingersBent(76);
+    }
+    
+    public boolean fingersBent()  
+    {
+        return sensor.allFingersBent(50);
+    } 
+    
+    public boolean fingersSpread()      
+    {
+        return !sensor.allFingersBent(50);    
+    } 
+    
+    public boolean isStable() 
     {
     	if((Math.abs(sensor.getOrientation().roll) < 35) && (Math.abs(sensor.getOrientation().pitch) < 35)) return true;
     	return false;
     }
-
+    
     //Consider implementing this with a Timer instead. Or just make this event a non-delayed event
     public boolean upsideDown()
     {
@@ -72,22 +77,23 @@ class xGloveGesture
     
     public boolean isSpacebarReleaseGesture()
     {
-    	if(!sensor.allFingersBent(55)) return true;
+    	if(!sensor.allFingersBent(50)) return true;
     	return false;
+    	//return true;
     }
-
+    
     public boolean isMouseClickGesture(boolean currentlyClicked) 
     {
-    	//Don't fire if currently clicked
-    	if(currentlyClicked)
-    	{
-    		return false;
-    	}
+    	// Don't fire if currently clicked
+    	if(currentlyClicked) return false;
     	else 
     	{
-    		currentlyClicked = sensor.allFingersBent(65) && Math.abs(sensor.getOrientation().pitch) < 35;
+    		//System.out.println("bent "+ sensor.allFingersBent(40));
+    		//System.out.println("pitch "+ (Math.abs(sensor.getOrientation().pitch) < 35));
+    		
+    		if((sensor.allFingersBent(40)) && (Math.abs(sensor.getOrientation().pitch) < 35)) return true;
+    		return false;
     	}
-    	return currentlyClicked; 
     }
     
     public boolean isDragMouseGesture(boolean currentlyClicked)
@@ -118,12 +124,14 @@ class xGloveGesture
     
     public boolean isScrollModeGesture() 
     {
-        return sensor.isFingerBent(Finger.RING, 60) && !(sensor.isFingerBent(Finger.MIDDLE, 53)) && !(sensor.isFingerBent(Finger.INDEX, 53));
+        return sensor.isFingerBent(Finger.RING, 83) && !(sensor.isFingerBent(Finger.MIDDLE, 56)) && !(sensor.isFingerBent(Finger.INDEX, 56));
     }
     
     public boolean isReleaseScrollModeGesture() 
     {
-    	return !sensor.isFingerBent(Finger.RING, 75) && (sensor.isFingerBent(Finger.MIDDLE, 45));
+    	//System.out.println("middle not bent "+ (sensor.isFingerBent(Finger.MIDDLE, 20)));
+    	//System.out.println("ring bent "+ (!sensor.isFingerBent(Finger.RING, 67)));
+    	return !sensor.isFingerBent(Finger.RING, 67) && (sensor.isFingerBent(Finger.MIDDLE, 20));
     }
     
     public boolean isMouseExitGesture()
@@ -147,19 +155,29 @@ class xGloveGesture
     
     public boolean isLoadNextGesture() 
     {
+    	//System.out.println("Next");
+    	//System.out.println("pitch "+ (sensor.getOrientation().pitch < -50));
+    	//System.out.println("roll "+ (Math.abs(sensor.getOrientation().roll) < 100));
         return ((sensor.getOrientation().pitch < -50) && (Math.abs(sensor.getOrientation().roll) < 100));
     }
     
     public boolean isLoadPreviousGesture() 
     {
+    	//System.out.println("Prev");
+    	//System.out.println("pitch "+ (sensor.getOrientation().pitch >  70));
+    	//System.out.println("roll "+ (Math.abs(sensor.getOrientation().roll) < 100));
         return ((sensor.getOrientation().pitch >  70) && (Math.abs(sensor.getOrientation().roll) < 100));
     }
     
     //Bend only index finger
     public boolean isToggleDongleGesture() {
-    	return sensor.isFingerBent(Finger.INDEX, 60) && 
-    			!sensor.isFingerBent(Finger.MIDDLE, 50) && !sensor.isFingerBent(Finger.RING, 50);
+    	//return sensor.isFingerBent(Finger.INDEX, 60) && 
+    	//		!sensor.isFingerBent(Finger.MIDDLE, 50) && !sensor.isFingerBent(Finger.RING, 50);
+    	//if(sensor.allFingersBent(60)) return true;
+    	if(isSpacebarGesture()) return true;
+    	return false;
     }
+    
     
     public int getInclinationFourFingers() 
     {
