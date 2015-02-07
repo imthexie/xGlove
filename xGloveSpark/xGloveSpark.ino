@@ -51,6 +51,10 @@ const String RESET_CMD = "RESET";
 //Has been reset or not
 boolean needReset;
 
+//Turn off WiFi
+//WiFiClass WiFi;
+//WiFi.off();
+
 void setup() 
 {
     Serial1.begin(115200);

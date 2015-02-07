@@ -61,6 +61,12 @@ class xGloveKeyboard
             xGloveDispatcher.threadSleep(50);
         }   
 	} 
+	
+	public void doWindowsStartButton() 
+	{
+		keyboardRobot.keyPress(KeyEvent.VK_WINDOWS);
+		keyboardRobot.keyRelease(KeyEvent.VK_WINDOWS);
+	}
 
 	/* Function: load_next_previous
 	 * --------------------

@@ -171,11 +171,8 @@ class xGloveGesture
     
     //Bend only index finger
     public boolean isToggleDongleGesture() {
-    	//return sensor.isFingerBent(Finger.INDEX, 60) && 
-    	//		!sensor.isFingerBent(Finger.MIDDLE, 50) && !sensor.isFingerBent(Finger.RING, 50);
-    	//if(sensor.allFingersBent(60)) return true;
-    	if(isSpacebarGesture()) return true;
-    	return false;
+    	return sensor.isFingerBent(Finger.INDEX, 60) && 
+    			!sensor.isFingerBent(Finger.MIDDLE, 50) && !sensor.isFingerBent(Finger.RING, 50);
     }
     
     

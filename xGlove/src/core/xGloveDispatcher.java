@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import org.apache.commons.lang3.SystemUtils;
 import dongle.DongleController;
 
 /**
@@ -35,6 +35,7 @@ class xGloveDispatcher {
     private ExecutorService threadPool;
     private ExecutorService dispatcherThread;
     private ExecutorService mouseThread;
+    private ExecutorService networkThread;
     
     //Boolean for if the dispatcher is on a blocking action, don't fire events.
     private volatile boolean dispatcherBlocked;
@@ -58,6 +59,9 @@ class xGloveDispatcher {
     	
     	//Mouse thread
     	mouseThread = Executors.newFixedThreadPool(1);
+
+    	//Network thread
+    	networkThread = Executors.newFixedThreadPool(1);
     	
         //Tweak the number of threads here
         threadPool             =      Executors.newFixedThreadPool(2);
@@ -147,7 +151,7 @@ class xGloveDispatcher {
     			}));
     	*/
     	// Mouse click
-    	jobArray.add(new Job(false, false, false,
+    	jobArray.add(new Job(false, false, false, false,
     			new Runnable() {
     				@Override 
     				public void run() 
@@ -165,7 +169,7 @@ class xGloveDispatcher {
     			}));     
         
     	//Mouse click release  
-    	jobArray.add(new Job(false, false, false,    
+    	jobArray.add(new Job(false, false, false, false,   
     			new Runnable() {  
     				@Override  
     				public void run()   
@@ -198,36 +202,50 @@ class xGloveDispatcher {
 						return gesture.isMouseExitGesture();
 					}
     			}));
-    		 
+    		 */
     	//Toggle Dongle
-    	jobArray.add(new Job(true, true, false,
+    	jobArray.add(new Job(true, true, false, true,
     			new Runnable() {
     				@Override 
     				public void run() 
     				{
-    					System.out.println("test test test");
-    					System.out.println("test test test");
-    					System.out.println("test test test");
-    					System.out.println("test test test");
-    					System.out.println("test test test");
     					dongleController.toggle();
-						while(!gesture.isSpacebarReleaseGesture());
+						while(!gesture.isToggleDongleGesture());
 					}
     			}, 
     			new Callable<Boolean>() {
 					@Override
 					public Boolean call() throws Exception 
 					{
-						return gesture.isSpacebarGesture();
-						//return gesture.isToggleDongleGesture();
+						return gesture.isToggleDongleGesture();
 					}
     			}));
+    	//Upside down
     	
-    	// Blocking jobs
-    	*/
+    	if(SystemUtils.IS_OS_WINDOWS) 
+		{
+    	jobArray.add(new Job(true, false, false, false,
+    			new Runnable() {
+    				@Override 
+    				public void run() 
+    				{
+    					keyboard.doWindowsStartButton();	
+    				}    
+    			}, 
+    			new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws Exception 
+					{
+						return gesture.upsideDown();
+					}
+    			}));
+		}
+
+    	//========== Blocking jobs====================
+    	
     	//Scroll Mode
     	
-    	jobArray.add(new Job(false, false, true,
+    	jobArray.add(new Job(false, false, true, false,
     			new Runnable() {
     				@Override 
     				public void run() 
@@ -245,7 +263,7 @@ class xGloveDispatcher {
     		 
     	
     	//Spacebar  
-    	jobArray.add(new Job(false, false, true,
+    	jobArray.add(new Job(false, false, true, false,
     			new Runnable() {
     				@Override 
     				public void run()  
@@ -264,12 +282,15 @@ class xGloveDispatcher {
     			}));  
     	
     	//Upside down
-    	jobArray.add(new Job(false, false, true,
+    	if(SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) 
+		{
+    	jobArray.add(new Job(false, false, true, false,
     			new Runnable() {
     				@Override 
     				public void run() 
     				{
     					keyboard.doMacLaunchpad();
+    					
     				}    
     			}, 
     			new Callable<Boolean>() {
@@ -279,10 +300,10 @@ class xGloveDispatcher {
 						return gesture.upsideDown();
 					}
     			}));
-    	
+		}
     	//Load next
     	
-    	jobArray.add(new Job(false, false, true,
+    	jobArray.add(new Job(false, false, true, false,
     			new Runnable() {
     				@Override 
     				public void run() 
@@ -299,7 +320,7 @@ class xGloveDispatcher {
     			}));
     	
     	//Load Previous
-    	jobArray.add(new Job(false, false, true,
+    	jobArray.add(new Job(false, false, true, false,
     			new Runnable() {
     				@Override 
     				public void run() 
@@ -320,17 +341,18 @@ class xGloveDispatcher {
     //When adding to the job array, make sure each specification in the constructor is correct for the correct behavior.
     private class Job 
     {
-    	private boolean isConcurrent, isLinear, isBlocking;
+    	private boolean isConcurrent, isLinear, isBlocking, isNetwork;
     	private Runnable event;
     	private LinearRunnableWrapper linearEventWrapper;
     	private Callable<Boolean> gestureCheck;
     	private volatile boolean isExecuting;
     	
-    	public Job(boolean isConcurrent, boolean isLinear, boolean isBlocking, Runnable event, Callable<Boolean> gestureCheck) 
+    	public Job(boolean isConcurrent, boolean isLinear, boolean isBlocking, boolean isNetwork, Runnable event, Callable<Boolean> gestureCheck) 
     	{
     		this.isConcurrent = isConcurrent;
     		this.isLinear = isLinear;
     		this.isBlocking = isBlocking;
+    		this.isNetwork = isNetwork;
     		
     		//The event to fire upon checking for the right gesture
     		this.event = event;
@@ -361,9 +383,18 @@ class xGloveDispatcher {
     	
     	public void execute() 
     	{
+    		//Linear within its own thread while being concurrent
     		if(isLinear && isConcurrent) 
     		{
-    			threadPool.execute(linearEventWrapper); //wrapper flips on/off isExecuting when executed
+    			if(isNetwork) 
+    			{
+    				networkThread.execute(linearEventWrapper);
+    			}
+    			else 
+    			{
+    				threadPool.execute(linearEventWrapper); //wrapper flips on/off isExecuting when executed
+    			}
+    			
     		}
     		else if(isConcurrent) 
 			{
